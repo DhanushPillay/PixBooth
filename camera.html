@@ -984,6 +984,21 @@
             updateToggleVisual(document.getElementById('bwToggle'), false);
             updateToggleVisual(document.getElementById('invertToggle'), false);
 
+            // Also reset fun effects
+            activeEffect = 'none';
+            effectsCanvas.style.display = 'none';
+            videoElement.style.opacity = '1'; // Restore raw video visibility
+            if (effectAnimId) { cancelAnimationFrame(effectAnimId); effectAnimId = null; }
+            faceDetectLoopRunning = false;
+            lastFaceLandmarks = null;
+            smoothedLeftEye = null;
+            smoothedRightEye = null;
+            document.querySelectorAll('.effect-btn').forEach(b => {
+                b.querySelector('.effect-box').classList.remove('border-primary');
+                b.querySelector('.effect-box').classList.add('border-transparent');
+            });
+            document.querySelector('[data-effect="none"] .effect-box').classList.add('border-primary');
+
             applyFilters();
         });
 
@@ -1156,7 +1171,13 @@
 
             const ctx = captureCanvas.getContext('2d');
             ctx.filter = videoElement.style.filter;
-            ctx.drawImage(videoElement, 0, 0);
+
+            // If an effect is active, draw from the effects canvas
+            if (activeEffect !== 'none' && effectsCanvas.style.display !== 'none') {
+                ctx.drawImage(effectsCanvas, 0, 0, captureCanvas.width, captureCanvas.height);
+            } else {
+                ctx.drawImage(videoElement, 0, 0);
+            }
 
             return captureCanvas.toDataURL('image/jpeg', 0.9);
         }
