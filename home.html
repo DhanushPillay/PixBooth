@@ -86,8 +86,7 @@
         }
 
         .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
+            animation: fadeInUp 0.6s ease-out both;
         }
 
         .stagger-1 {
@@ -132,7 +131,12 @@
             box-shadow: none;
         }
 
-        /* Selected card pulse */
+        /* Selected card pulse — uses box-shadow only, won't conflict with opacity */
+        .card-selected {
+            box-shadow: 0 0 0 0 rgba(231, 185, 35, 0.4);
+            animation: selectedPulse 2s ease-in-out infinite;
+        }
+
         @keyframes selectedPulse {
 
             0%,
@@ -143,10 +147,6 @@
             50% {
                 box-shadow: 0 0 0 8px rgba(231, 185, 35, 0);
             }
-        }
-
-        .card-selected {
-            animation: selectedPulse 2s ease-in-out infinite;
         }
 
         /* Layout preview gradients */
@@ -195,7 +195,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 p-4 mb-10">
 
                             <!-- Strip 3 -->
-                            <div class="layout-card animate-fade-in-up stagger-1 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+                            <div class="layout-card animate-fade-in-up stagger-1 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
                                 data-layout="strip3" data-rows="3" data-cols="1" data-name="Strip 3">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-2 justify-center items-center">
@@ -210,7 +210,7 @@
                             </div>
 
                             <!-- Strip 4 -->
-                            <div class="layout-card animate-fade-in-up stagger-2 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+                            <div class="layout-card animate-fade-in-up stagger-2 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
                                 data-layout="strip4" data-rows="4" data-cols="1" data-name="Strip 4">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-1.5 justify-center items-center">
@@ -226,7 +226,7 @@
                             </div>
 
                             <!-- 2x2 Grid -->
-                            <div class="layout-card animate-fade-in-up stagger-3 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+                            <div class="layout-card animate-fade-in-up stagger-3 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
                                 data-layout="grid2x2" data-rows="2" data-cols="2" data-name="2x2 Grid">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 grid grid-cols-2 grid-rows-2 p-2.5 gap-2">
@@ -242,7 +242,7 @@
                             </div>
 
                             <!-- Row 3 -->
-                            <div class="layout-card animate-fade-in-up stagger-4 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+                            <div class="layout-card animate-fade-in-up stagger-4 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
                                 data-layout="row3" data-rows="1" data-cols="3" data-name="Row 3">
                                 <div class="w-full h-48 rounded-xl bg-white/40 flex p-2.5 gap-2 items-center">
                                     <div class="preview-slot flex-1 h-full rounded-lg"></div>
@@ -265,13 +265,7 @@
                         </div>
                     </main>
 
-                    <!-- Footer -->
-                    <footer
-                        class="flex items-center justify-center gap-3 glass rounded-2xl px-6 py-3 mb-4 mx-4 animate-fade-in-up stagger-5">
-                        <span class="material-symbols-outlined text-gray-600 text-xl">shield</span>
-                        <p class="text-gray-600 text-sm font-medium">Your privacy is important — all photos stay on your
-                            device.</p>
-                    </footer>
+
                 </div>
             </div>
         </div>
@@ -281,6 +275,14 @@
         const layoutCards = document.querySelectorAll('.layout-card');
         const beginBtn = document.getElementById('beginSessionBtn');
         let selectedLayout = null;
+
+        // Remove entrance animation classes after they've played,
+        // so they won't replay when card-selected is toggled
+        setTimeout(() => {
+            document.querySelectorAll('.animate-fade-in-up').forEach(el => {
+                el.classList.remove('animate-fade-in-up', 'stagger-1', 'stagger-2', 'stagger-3', 'stagger-4', 'stagger-5');
+            });
+        }, 1200);
 
         // Load previously selected layout if exists
         const savedLayout = localStorage.getItem('selectedLayout');
@@ -301,16 +303,13 @@
         function selectLayout(card) {
             // Remove selected state from all cards
             layoutCards.forEach(c => {
-                c.classList.remove('border-primary', 'shadow-primary/30', 'md:scale-105', 'card-selected');
+                c.classList.remove('border-primary', 'shadow-primary/30', 'card-selected');
                 c.classList.add('border-transparent');
-                if (!c.classList.contains('md:hover:scale-105')) {
-                    c.classList.add('md:hover:scale-105');
-                }
             });
 
             // Add selected state to clicked card
-            card.classList.remove('border-transparent', 'md:hover:scale-105');
-            card.classList.add('border-primary', 'shadow-primary/30', 'md:scale-105', 'card-selected');
+            card.classList.remove('border-transparent');
+            card.classList.add('border-primary', 'shadow-primary/30', 'card-selected');
 
             // Store layout data
             selectedLayout = {
