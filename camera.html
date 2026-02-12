@@ -7,6 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>PixBooth</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script>
@@ -595,6 +596,14 @@
         let activeEffect = 'none';
         let effectAnimId = null;
         let glitterParticles = [];
+        // Face detection state for AR specs
+        let faceDetectionReady = false;
+        let lastFaceLandmarks = null; // Stores latest detected face landmarks
+        let faceDetectLoopRunning = false;
+        // Smoothed positions for fluid glasses movement
+        let smoothedLeftEye = null;
+        let smoothedRightEye = null;
+
 
 
         // Filter values
@@ -1269,6 +1278,163 @@
                 window.location.href = 'download.html';
             }
         });
+
+        // === AR Face Detection for Specs ===
+        // Load face-api.js models when the library is ready
+        async function initFaceDetection() {
+            if (typeof faceapi === 'undefined') {
+                // Library not loaded yet, retry in 500ms
+                setTimeout(initFaceDetection, 500);
+                return;
+            }
+            try {
+                const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
+                faceDetectionReady = true;
+                console.log('Face detection models loaded!');
+            } catch (err) {
+                console.warn('Face detection models failed to load:', err);
+            }
+        }
+        initFaceDetection();
+
+        // Async face detection loop — runs independently from render loop
+        async function faceDetectLoop() {
+            if (!faceDetectLoopRunning || activeEffect !== 'specs') {
+                faceDetectLoopRunning = false;
+                return;
+            }
+            if (faceDetectionReady && videoElement.readyState >= 2) {
+                try {
+                    const detection = await faceapi
+                        .detectSingleFace(videoElement, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 }))
+                        .withFaceLandmarks(true); // true = use tiny model
+                    if (detection) {
+                        lastFaceLandmarks = detection.landmarks;
+                    }
+                } catch (e) { /* silently ignore detection errors */ }
+            }
+            // Run detection at ~12fps (separate from render)
+            setTimeout(faceDetectLoop, 80);
+        }
+
+        // Helper: get center of a set of landmark points
+        function getLandmarkCenter(points) {
+            let sx = 0, sy = 0;
+            for (const p of points) { sx += p.x; sy += p.y; }
+            return { x: sx / points.length, y: sy / points.length };
+        }
+
+        // Helper: smooth interpolation for fluid movement
+        function lerp(prev, target, factor) {
+            if (!prev) return target;
+            return { x: prev.x + (target.x - prev.x) * factor, y: prev.y + (target.y - prev.y) * factor };
+        }
+
+        // Specs: AR sunglasses that track face landmarks
+        function renderSpecs(w, h) {
+            effectsCtx.drawImage(videoElement, 0, 0, w, h);
+            effectsCtx.filter = 'none';
+
+            // Start face detection loop if not running
+            if (!faceDetectLoopRunning) {
+                faceDetectLoopRunning = true;
+                faceDetectLoop();
+            }
+
+            let leftEyeCenter, rightEyeCenter, eyeDist;
+
+            if (lastFaceLandmarks) {
+                // face-api landmark indices: left eye = points 36-41, right eye = 42-47
+                const leftEyePts = lastFaceLandmarks.getLeftEye();
+                const rightEyePts = lastFaceLandmarks.getRightEye();
+
+                const rawLeft = getLandmarkCenter(leftEyePts);
+                const rawRight = getLandmarkCenter(rightEyePts);
+
+                // Smooth positions for fluid movement (lerp factor 0.35)
+                smoothedLeftEye = lerp(smoothedLeftEye, rawLeft, 0.35);
+                smoothedRightEye = lerp(smoothedRightEye, rawRight, 0.35);
+
+                leftEyeCenter = smoothedLeftEye;
+                rightEyeCenter = smoothedRightEye;
+                eyeDist = Math.sqrt(Math.pow(rightEyeCenter.x - leftEyeCenter.x, 2) + Math.pow(rightEyeCenter.y - leftEyeCenter.y, 2));
+            } else {
+                // Fallback: centered position while face loads
+                leftEyeCenter = { x: w * 0.4, y: h * 0.38 };
+                rightEyeCenter = { x: w * 0.6, y: h * 0.38 };
+                eyeDist = w * 0.2;
+            }
+
+            // Calculate glasses dimensions from eye distance
+            const scale = eyeDist / 130;
+            const cx = (leftEyeCenter.x + rightEyeCenter.x) / 2;
+            const cy = (leftEyeCenter.y + rightEyeCenter.y) / 2;
+            const angle = Math.atan2(rightEyeCenter.y - leftEyeCenter.y, rightEyeCenter.x - leftEyeCenter.x);
+
+            const lensW = 72 * scale;
+            const lensH = 55 * scale;
+            const gap = 16 * scale;
+            const r = 16 * scale;
+            const frameW = Math.max(3, 5 * scale);
+            const armLen = 85 * scale;
+
+            effectsCtx.save();
+            effectsCtx.translate(cx, cy);
+            effectsCtx.rotate(angle); // Tilt glasses with head rotation
+
+            effectsCtx.strokeStyle = '#1a1a1a';
+            effectsCtx.lineWidth = frameW;
+            effectsCtx.lineCap = 'round';
+            effectsCtx.lineJoin = 'round';
+
+            // Left lens (centered at -eyeDist/2)
+            const lx = -gap / 2 - lensW;
+            const ly = -lensH / 2;
+            effectsCtx.beginPath();
+            effectsCtx.roundRect(lx, ly, lensW, lensH, r);
+            effectsCtx.fillStyle = 'rgba(30, 30, 30, 0.5)';
+            effectsCtx.fill();
+            effectsCtx.stroke();
+
+            // Right lens
+            const rx = gap / 2;
+            effectsCtx.beginPath();
+            effectsCtx.roundRect(rx, ly, lensW, lensH, r);
+            effectsCtx.fill();
+            effectsCtx.stroke();
+
+            // Bridge
+            effectsCtx.beginPath();
+            effectsCtx.moveTo(-gap / 2, -4 * scale);
+            effectsCtx.quadraticCurveTo(0, -14 * scale, gap / 2, -4 * scale);
+            effectsCtx.stroke();
+
+            // Left temple arm
+            effectsCtx.beginPath();
+            effectsCtx.moveTo(lx, 0);
+            effectsCtx.lineTo(lx - armLen, 8 * scale);
+            effectsCtx.stroke();
+
+            // Right temple arm
+            effectsCtx.beginPath();
+            effectsCtx.moveTo(rx + lensW, 0);
+            effectsCtx.lineTo(rx + lensW + armLen, 8 * scale);
+            effectsCtx.stroke();
+
+            // Lens shine
+            effectsCtx.globalAlpha = 0.18;
+            effectsCtx.fillStyle = '#ffffff';
+            effectsCtx.beginPath();
+            effectsCtx.ellipse(lx + lensW * 0.3, ly + lensH * 0.3, 10 * scale, 6 * scale, -0.4, 0, Math.PI * 2);
+            effectsCtx.fill();
+            effectsCtx.beginPath();
+            effectsCtx.ellipse(rx + lensW * 0.3, ly + lensH * 0.3, 10 * scale, 6 * scale, -0.4, 0, Math.PI * 2);
+            effectsCtx.fill();
+
+            effectsCtx.restore();
+        }
 
         // Initialize camera on page load
         initCamera();
