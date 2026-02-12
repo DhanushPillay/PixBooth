@@ -224,6 +224,11 @@
                         <div id="flashOverlay" class="absolute inset-0 bg-white rounded-2xl pointer-events-none hidden"
                             style="opacity:0;"></div>
 
+                        <!-- Effects Canvas Overlay -->
+                        <canvas id="effectsCanvas"
+                            class="absolute inset-0 w-full h-full rounded-2xl pointer-events-none"
+                            style="display:none;"></canvas>
+
                         <!-- Countdown Overlay -->
                         <div id="countdownOverlay"
                             class="absolute inset-0 hidden items-center justify-center rounded-2xl"
@@ -374,6 +379,85 @@
                         </div>
                     </div>
 
+
+                    <!-- Fun Effects -->
+                    <div>
+                        <h2 class="mb-3 text-xs font-bold uppercase tracking-wider text-text-light/60">🎉 Fun Effects
+                        </h2>
+                        <div class="grid grid-cols-4 gap-2 pb-2">
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="none">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-white/30 border-2 border-primary flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    ✕
+                                </div>
+                                <p class="text-[10px] font-semibold">Off</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="glitter">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-yellow-200 to-pink-300 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    ✨
+                                </div>
+                                <p class="text-[10px] font-semibold">Glitter</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="mirror">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-sky-200 to-indigo-300 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🪞
+                                </div>
+                                <p class="text-[10px] font-semibold">Mirror</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="kaleidoscope">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-300 to-teal-400 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🔮
+                                </div>
+                                <p class="text-[10px] font-semibold">Kaleido</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer" data-effect="vhs">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-red-300 to-orange-300 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    📼
+                                </div>
+                                <p class="text-[10px] font-semibold">VHS</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="rgbsplit">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-red-400 via-green-300 to-blue-400 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🌈
+                                </div>
+                                <p class="text-[10px] font-semibold">RGB</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="pixelate">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-lime-300 to-green-400 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🟩
+                                </div>
+                                <p class="text-[10px] font-semibold">Pixel</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="lightleak">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-orange-200 to-rose-300 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🌸
+                                </div>
+                                <p class="text-[10px] font-semibold">Leak</p>
+                            </div>
+                            <div class="effect-btn flex flex-col items-center gap-1.5 cursor-pointer"
+                                data-effect="specs">
+                                <div
+                                    class="effect-box h-12 w-12 rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 border-2 border-transparent flex items-center justify-center shadow-sm text-lg transition-all duration-200 hover:scale-110">
+                                    🤓
+                                </div>
+                                <p class="text-[10px] font-semibold">Specs</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Manual Adjustments -->
                     <div>
