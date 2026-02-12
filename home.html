@@ -6,23 +6,23 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>PixBooth - Choose Your Layout</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
                         "primary": "#e7b923",
+                        "primary-dark": "#c99e1c",
                         "background-light": "rgb(176, 236, 181)",
                         "background-dark": "rgb(176, 236, 181)",
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
                     },
-                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
                 },
             },
         }
@@ -35,121 +35,249 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
+        /* Animated gradient background */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .animated-bg {
+            background: linear-gradient(-45deg, #b0ecb5, #7ecfc0, #a8e6cf, #88d8a8, #c1f0c1);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Card entrance animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.5s;
+        }
+
+        /* Button glow */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(231, 185, 35, 0.3), 0 8px 30px rgba(231, 185, 35, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(231, 185, 35, 0.5), 0 8px 40px rgba(231, 185, 35, 0.3);
+            }
+        }
+
+        .btn-glow {
+            animation: glowPulse 2.5s ease-in-out infinite;
+        }
+
+        .btn-glow:disabled {
+            animation: none;
+            box-shadow: none;
+        }
+
+        /* Selected card pulse */
+        @keyframes selectedPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 185, 35, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(231, 185, 35, 0);
+            }
+        }
+
+        .card-selected {
+            animation: selectedPulse 2s ease-in-out infinite;
+        }
+
+        /* Layout preview gradients */
+        .preview-slot {
+            background: linear-gradient(135deg, #d1d5db 0%, #e5e7eb 50%, #d1d5db 100%);
+            transition: all 0.3s ease;
+        }
+
+        .layout-card:hover .preview-slot {
+            background: linear-gradient(135deg, #c5cdd6 0%, #dde1e6 50%, #c5cdd6 100%);
+        }
     </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-[#1b180e] dark:text-gray-200">
-    <div class="relative flex h-auto min-h-screen w-full flex-col font-display group/design-root overflow-x-hidden">
-        <div class="layout-container flex h-full grow flex-col">
+<body class="animated-bg text-gray-800 font-display">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="flex h-full grow flex-col">
             <div class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
-                <div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
-                    <header class="hidden">
-                        <div class="flex items-center gap-4 text-white">
-                            <div class="size-6 text-primary">
-                                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <path clip-rule="evenodd"
-                                        d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
-                                        fill="currentColor" fill-rule="evenodd"></path>
-                                </svg>
+                <div class="flex flex-col w-full max-w-[960px] flex-1">
+
+                    <!-- Header -->
+                    <header class="flex items-center justify-center py-6 animate-fade-in-up">
+                        <div class="flex items-center gap-3 glass rounded-2xl px-6 py-3 shadow-lg">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-md">
+                                <span class="material-symbols-outlined text-white"
+                                    style="font-variation-settings: 'FILL' 1;">photo_camera</span>
                             </div>
-                            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">PixBooth</h2>
+                            <h2 class="text-2xl font-black tracking-tight text-gray-800">PixBooth</h2>
                         </div>
-                        <p class="hidden md:block text-gray-400 text-sm font-normal">Create timeless memories.</p>
                     </header>
+
                     <main class="flex-grow">
-                        <div class="flex flex-wrap justify-center text-center gap-3 p-4 mb-12">
+                        <!-- Title Section -->
+                        <div
+                            class="flex flex-wrap justify-center text-center gap-3 p-4 mb-8 animate-fade-in-up stagger-1">
                             <div class="flex w-full flex-col gap-3">
                                 <p
-                                    class="text-gray-800 text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+                                    class="text-gray-900 text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
                                     Choose Your Layout</p>
-                                <p class="text-gray-600 text-base font-normal leading-normal max-w-md mx-auto">Select
-                                    your preferred photo arrangement to begin your session.</p>
+                                <p class="text-gray-600 text-base font-normal leading-relaxed max-w-md mx-auto">
+                                    Select your preferred photo arrangement to begin your session.</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 p-4 mb-12">
-                            <div class="layout-card flex flex-col group gap-3 pb-3 bg-white/90 p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+
+                        <!-- Layout Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 p-4 mb-10">
+
+                            <!-- Strip 3 -->
+                            <div class="layout-card animate-fade-in-up stagger-1 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
                                 data-layout="strip3" data-rows="3" data-cols="1" data-name="Strip 3">
                                 <div
-                                    class="w-full aspect-[3/4] rounded-lg bg-gray-100 flex flex-col p-2 gap-2 justify-center items-center">
-                                    <div class="w-full h-1/3 bg-gray-300 rounded-md"></div>
-                                    <div class="w-full h-1/3 bg-gray-300 rounded-md"></div>
-                                    <div class="w-full h-1/3 bg-gray-300 rounded-md"></div>
+                                    class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-2 justify-center items-center">
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
                                 </div>
                                 <div>
-                                    <p class="text-gray-800 text-base font-semibold leading-normal">Strip 3</p>
-                                    <p class="text-gray-600 text-sm font-normal leading-normal">3 Photos, Vertical</p>
+                                    <p class="text-gray-800 text-base font-bold leading-normal">Strip 3</p>
+                                    <p class="text-gray-500 text-sm font-medium leading-normal">3 Photos, Vertical</p>
                                 </div>
                             </div>
-                            <div class="layout-card flex flex-col group gap-3 pb-3 bg-white/90 p-4 sm:p-5 rounded-2xl border-2 border-primary transition-all duration-300 cursor-pointer shadow-xl shadow-primary/30 md:scale-105"
+
+                            <!-- Strip 4 -->
+                            <div class="layout-card animate-fade-in-up stagger-2 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
                                 data-layout="strip4" data-rows="4" data-cols="1" data-name="Strip 4">
                                 <div
-                                    class="w-full aspect-[3/4] rounded-lg bg-gray-100 flex flex-col p-2 gap-2 justify-center items-center">
-                                    <div class="w-full h-1/4 bg-gray-300 rounded-md"></div>
-                                    <div class="w-full h-1/4 bg-gray-300 rounded-md"></div>
-                                    <div class="w-full h-1/4 bg-gray-300 rounded-md"></div>
-                                    <div class="w-full h-1/4 bg-gray-300 rounded-md"></div>
+                                    class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-1.5 justify-center items-center">
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
+                                    <div class="preview-slot w-full flex-1 rounded-lg"></div>
                                 </div>
                                 <div>
-                                    <p class="text-gray-800 text-base font-semibold leading-normal">Strip 4</p>
-                                    <p class="text-gray-600 text-sm font-normal leading-normal">4 Photos, Vertical</p>
+                                    <p class="text-gray-800 text-base font-bold leading-normal">Strip 4</p>
+                                    <p class="text-gray-500 text-sm font-medium leading-normal">4 Photos, Vertical</p>
                                 </div>
                             </div>
-                            <div class="layout-card flex flex-col group gap-3 pb-3 bg-white/90 p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+
+                            <!-- 2x2 Grid -->
+                            <div class="layout-card animate-fade-in-up stagger-3 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
                                 data-layout="grid2x2" data-rows="2" data-cols="2" data-name="2x2 Grid">
                                 <div
-                                    class="w-full aspect-[1/1] rounded-lg bg-gray-100 flex flex-wrap p-2 gap-2 justify-center items-center">
-                                    <div class="w-[calc(50%-0.25rem)] h-[calc(50%-0.25rem)] bg-gray-300 rounded-md">
-                                    </div>
-                                    <div class="w-[calc(50%-0.25rem)] h-[calc(50%-0.25rem)] bg-gray-300 rounded-md">
-                                    </div>
-                                    <div class="w-[calc(50%-0.25rem)] h-[calc(50%-0.25rem)] bg-gray-300 rounded-md">
-                                    </div>
-                                    <div class="w-[calc(50%-0.25rem)] h-[calc(50%-0.25rem)] bg-gray-300 rounded-md">
-                                    </div>
+                                    class="w-full h-48 rounded-xl bg-white/40 grid grid-cols-2 grid-rows-2 p-2.5 gap-2">
+                                    <div class="preview-slot rounded-lg"></div>
+                                    <div class="preview-slot rounded-lg"></div>
+                                    <div class="preview-slot rounded-lg"></div>
+                                    <div class="preview-slot rounded-lg"></div>
                                 </div>
                                 <div>
-                                    <p class="text-gray-800 text-base font-semibold leading-normal">2x2 Grid</p>
-                                    <p class="text-gray-600 text-sm font-normal leading-normal">4 Photos, Square</p>
+                                    <p class="text-gray-800 text-base font-bold leading-normal">2x2 Grid</p>
+                                    <p class="text-gray-500 text-sm font-medium leading-normal">4 Photos, Square</p>
                                 </div>
                             </div>
-                            <div class="layout-card flex flex-col group gap-3 pb-3 bg-white/90 p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
+
+                            <!-- Row 3 -->
+                            <div class="layout-card animate-fade-in-up stagger-4 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary active:border-primary transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl md:hover:scale-105 active:scale-[1.02]"
                                 data-layout="row3" data-rows="1" data-cols="3" data-name="Row 3">
-                                <div
-                                    class="w-full aspect-[4/3] rounded-lg bg-gray-100 flex p-2 gap-2 justify-center items-center">
-                                    <div class="w-1/3 h-full bg-gray-300 rounded-md"></div>
-                                    <div class="w-1/3 h-full bg-gray-300 rounded-md"></div>
-                                    <div class="w-1/3 h-full bg-gray-300 rounded-md"></div>
+                                <div class="w-full h-48 rounded-xl bg-white/40 flex p-2.5 gap-2 items-center">
+                                    <div class="preview-slot flex-1 h-full rounded-lg"></div>
+                                    <div class="preview-slot flex-1 h-full rounded-lg"></div>
+                                    <div class="preview-slot flex-1 h-full rounded-lg"></div>
                                 </div>
                                 <div>
-                                    <p class="text-gray-800 text-base font-semibold leading-normal">Row 3</p>
-                                    <p class="text-gray-600 text-sm font-normal leading-normal">3 Photos, Horizontal</p>
+                                    <p class="text-gray-800 text-base font-bold leading-normal">Row 3</p>
+                                    <p class="text-gray-500 text-sm font-medium leading-normal">3 Photos, Horizontal</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex px-4 py-3 justify-center mb-12">
+
+                        <!-- Begin Button -->
+                        <div class="flex px-4 py-3 justify-center mb-10 animate-fade-in-up stagger-5">
                             <button id="beginSessionBtn" disabled
-                                class="flex min-w-[84px] w-full max-w-sm cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-16 px-5 bg-primary text-gray-900 text-lg font-bold leading-normal tracking-[0.015em] shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                                class="btn-glow flex min-w-[84px] w-full max-w-sm cursor-pointer items-center justify-center overflow-hidden rounded-2xl h-16 px-5 bg-gradient-to-r from-primary to-yellow-400 text-gray-900 text-lg font-bold leading-normal tracking-[0.015em] hover:scale-105 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
                                 <span class="truncate">Begin Your Session</span>
                             </button>
                         </div>
                     </main>
-                    <footer class="flex items-center justify-center gap-4 bg-transparent px-4 min-h-14 mt-auto">
-                        <div class="flex items-center gap-3">
-                            <div class="text-gray-600 flex items-center justify-center shrink-0 size-10">
-                                <span class="material-symbols-outlined">
-                                    shield
-                                </span>
-                            </div>
-                            <p class="text-gray-600 text-sm font-normal leading-normal flex-1 truncate">Your privacy is
-                                important to us. All photos are yours.</p>
-                        </div>
+
+                    <!-- Footer -->
+                    <footer
+                        class="flex items-center justify-center gap-3 glass rounded-2xl px-6 py-3 mb-4 mx-4 animate-fade-in-up stagger-5">
+                        <span class="material-symbols-outlined text-gray-600 text-xl">shield</span>
+                        <p class="text-gray-600 text-sm font-medium">Your privacy is important — all photos stay on your
+                            device.</p>
                     </footer>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
-        // Layout selection functionality
         const layoutCards = document.querySelectorAll('.layout-card');
         const beginBtn = document.getElementById('beginSessionBtn');
         let selectedLayout = null;
@@ -173,13 +301,16 @@
         function selectLayout(card) {
             // Remove selected state from all cards
             layoutCards.forEach(c => {
-                c.classList.remove('border-primary', 'ring-primary', 'shadow-primary/20');
-                c.classList.add('border-transparent', 'ring-white/10');
+                c.classList.remove('border-primary', 'shadow-primary/30', 'md:scale-105', 'card-selected');
+                c.classList.add('border-transparent');
+                if (!c.classList.contains('md:hover:scale-105')) {
+                    c.classList.add('md:hover:scale-105');
+                }
             });
 
             // Add selected state to clicked card
-            card.classList.remove('border-transparent', 'ring-white/10');
-            card.classList.add('border-primary', 'ring-primary', 'shadow-primary/20');
+            card.classList.remove('border-transparent', 'md:hover:scale-105');
+            card.classList.add('border-primary', 'shadow-primary/30', 'md:scale-105', 'card-selected');
 
             // Store layout data
             selectedLayout = {
@@ -200,6 +331,7 @@
             }
         });
     </script>
+
 </body>
 
 </html>

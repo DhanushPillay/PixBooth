@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Your Photo Strip</title>
+    <title>PixBooth - Your Photo Strip</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -47,17 +47,173 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             font-size: 20px;
         }
+
+        /* Animated gradient background */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .animated-bg {
+            background: linear-gradient(-45deg, #b0ecb5, #7ecfc0, #a8e6cf, #88d8a8, #c1f0c1);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #1b180e 0%, #e7b923 50%, #1b180e 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerText 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmerText {
+
+            0%,
+            100% {
+                background-position: 0% center;
+            }
+
+            50% {
+                background-position: 200% center;
+            }
+        }
+
+        /* Entrance animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Download button glow */
+        @keyframes downloadGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(231, 185, 35, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(231, 185, 35, 0.5);
+            }
+        }
+
+        .download-glow {
+            animation: downloadGlow 2s ease-in-out infinite;
+        }
+
+        .download-glow:hover .dl-icon {
+            animation: bounceDown 0.4s ease;
+        }
+
+        @keyframes bounceDown {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(3px);
+            }
+        }
+
+        /* Checkmark for selected color swatch */
+        .color-option.selected::after {
+            content: '\2713';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .color-option {
+            position: relative;
+        }
+
+        /* Sparkle footer */
+        @keyframes sparkle {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .sparkle-text {
+            animation: sparkle 2s ease-in-out infinite;
+        }
     </style>
 </head>
 
-<body class="font-display">
-    <div
-        class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark group/design-root overflow-x-hidden">
+<body class="font-display animated-bg">
+    <div class="relative flex h-auto min-h-screen w-full flex-col text-text-light group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
             <div class="px-4 sm:px-6 md:px-10 lg:px-20 flex flex-1 justify-center py-5">
                 <div class="layout-content-container flex flex-col max-w-[960px] w-full flex-1 items-center">
-                    <div class="flex flex-wrap justify-center gap-3 p-4 text-center">
-                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Your
+                    <div class="flex flex-wrap justify-center gap-3 p-4 text-center animate-fade-in-up">
+                        <h1
+                            class="gradient-text text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            Your
                             Photo Strip</h1>
                     </div>
                     <div class="w-full flex justify-center p-4">
@@ -65,21 +221,21 @@
                             <!-- Photos will be dynamically generated here -->
                         </div>
                     </div>
-                    <div class="flex justify-center w-full mt-4">
+                    <div class="flex justify-center w-full mt-4 animate-fade-in-up delay-1">
                         <div
                             class="flex flex-col sm:flex-row flex-1 flex-wrap justify-center gap-3 px-4 py-3 max-w-[480px]">
                             <button id="editFiltersBtn"
-                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-80 dark:hover:bg-opacity-80">
+                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 glass-strong text-text-light text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/60 transition-all hover:scale-105 active:scale-95">
                                 <span class="truncate">Edit Filters</span>
                             </button>
                             <a href="home.html"
-                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 bg-transparent text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-[0.015em] border border-surface-light dark:border-surface-dark hover:bg-surface-light/50 dark:hover:bg-surface-dark/50">
+                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 glass text-text-light text-sm font-bold leading-normal tracking-[0.015em] hover:bg-white/40 transition-all hover:scale-105 active:scale-95">
                                 <span class="truncate">Start New Session</span>
                             </a>
                         </div>
                     </div>
-                    <div class="p-4">
-                        <h3 class="text-sm font-medium text-text-light dark:text-text-dark mb-3">Strip Color</h3>
+                    <div class="p-4 animate-fade-in-up delay-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-text-light/60 mb-3">Strip Color</h3>
                         <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
                             <button
                                 class="color-option w-12 h-12 rounded-lg border-2 border-primary shadow-md hover:scale-110 transition-transform"
@@ -143,32 +299,31 @@
                                 data-color="#F9FBE7" style="background-color: #F9FBE7;" title="Pale Lime"></button>
                         </div>
                         <button id="addEmojiBtn"
-                            class="w-full flex cursor-pointer items-center justify-center gap-x-2 rounded-xl bg-surface-light dark:bg-surface-dark px-4 py-3 sm:py-2 hover:bg-opacity-80 dark:hover:bg-opacity-80">
-                            <span
-                                class="material-symbols-outlined text-text-light dark:text-text-dark">add_reaction</span>
-                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal">Add Emoji
-                            </p>
+                            class="w-full flex cursor-pointer items-center justify-center gap-x-2 rounded-xl glass-strong px-4 py-3 sm:py-2 hover:bg-white/60 transition-all hover:scale-[1.02] active:scale-95">
+                            <span class="material-symbols-outlined text-text-light">add_reaction</span>
+                            <p class="text-text-light text-sm font-bold leading-normal">Add Emoji</p>
                         </button>
                     </div>
-                    <div class="flex px-4 py-3 justify-center w-full mt-4">
+                    <div class="flex px-4 py-3 justify-center w-full mt-4 animate-fade-in-up delay-3">
                         <div class="flex flex-col sm:flex-row gap-3 w-full max-w-[480px] items-stretch sm:items-center">
                             <select id="formatSelect"
-                                class="rounded-lg border px-3 py-3 sm:py-2 bg-white dark:bg-background-dark text-sm">
+                                class="rounded-xl border border-white/40 px-3 py-3 sm:py-2 glass text-sm font-medium">
                                 <option value="png">PNG (lossless)</option>
                                 <option value="jpeg">JPEG (compressed)</option>
                             </select>
 
                             <button id="downloadBtn"
-                                class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 sm:h-12 px-5 bg-primary text-text-light dark:text-text-dark gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110">
-                                <span
-                                    class="material-symbols-outlined text-text-light dark:text-text-dark">download</span>
+                                class="download-glow flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 sm:h-12 px-5 bg-gradient-to-r from-primary to-yellow-400 text-gray-900 gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:scale-105 transition-all active:scale-95">
+                                <span class="material-symbols-outlined dl-icon text-gray-900">download</span>
                                 <span class="truncate">Download Photo Strip</span>
                             </button>
                         </div>
                     </div>
-                    <div class="mt-8 text-center text-sm text-text-light/60 dark:text-text-dark/60">
-                        <p>Thank you for using PixBooth!</p>
-                        <a class="underline hover:text-primary" href="#">Privacy Policy</a>
+                    <div class="mt-8 mb-6 text-center glass rounded-2xl px-6 py-4 mx-4">
+                        <p class="sparkle-text text-sm font-medium text-text-light/70">✨ Thank you for using PixBooth! ✨
+                        </p>
+                        <a class="text-xs underline hover:text-primary text-text-light/50 mt-1 inline-block"
+                            href="#">Privacy Policy</a>
                     </div>
                 </div>
             </div>
@@ -767,17 +922,22 @@
         // Color selection
         const colorOptions = document.querySelectorAll('.color-option');
 
+        // Mark the first swatch (white) as initially selected
+        if (colorOptions.length > 0) {
+            colorOptions[0].classList.add('selected');
+        }
+
         colorOptions.forEach(option => {
             option.addEventListener('click', () => {
                 // Remove active state from all
                 colorOptions.forEach(opt => {
-                    opt.classList.remove('border-primary');
+                    opt.classList.remove('border-primary', 'selected');
                     opt.classList.add('border-transparent');
                 });
 
                 // Add active state to selected
                 option.classList.remove('border-transparent');
-                option.classList.add('border-primary');
+                option.classList.add('border-primary', 'selected');
 
                 stripColor = option.dataset.color;
                 renderPhotoStrip();
