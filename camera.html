@@ -589,6 +589,13 @@
         const intensitySlider = document.getElementById('intensitySlider');
         const resetBtn = document.getElementById('resetBtn');
         const filterPresets = document.querySelectorAll('[data-filter]');
+        // Effects engine variables (declared early for use in reset handler)
+        const effectsCanvas = document.getElementById('effectsCanvas');
+        const effectsCtx = effectsCanvas.getContext('2d');
+        let activeEffect = 'none';
+        let effectAnimId = null;
+        let glitterParticles = [];
+
 
         // Filter values
         let filters = {
@@ -601,6 +608,249 @@
             invert: false
         };
 
+        });
+
+        // === Fun Effects Engine ===
+
+        // Effect button selection
+        const effectBtns = document.querySelectorAll('.effect-btn');
+        effectBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update visual selection
+                effectBtns.forEach(b => {
+                    b.querySelector('.effect-box').classList.remove('border-primary');
+                    b.querySelector('.effect-box').classList.add('border-transparent');
+                });
+                btn.querySelector('.effect-box').classList.remove('border-transparent');
+                btn.querySelector('.effect-box').classList.add('border-primary');
+
+                activeEffect = btn.dataset.effect;
+
+                if (activeEffect === 'none') {
+                    effectsCanvas.style.display = 'none';
+                    videoElement.style.opacity = '1'; // Show raw video again
+                    if (effectAnimId) cancelAnimationFrame(effectAnimId);
+                    effectAnimId = null;
+                } else {
+                    effectsCanvas.style.display = 'block';
+                    videoElement.style.opacity = '0'; // Hide raw video, effects canvas takes over
+                    glitterParticles = []; // Reset particles on effect change
+                    if (!effectAnimId) renderEffectsLoop();
+                }
+            });
+        });
+
+        // Main render loop for effects — runs at ~30fps
+        function renderEffectsLoop() {
+            if (activeEffect === 'none') {
+                effectAnimId = null;
+                return;
+            }
+
+            // Match canvas resolution to video
+            const vw = videoElement.videoWidth || 640;
+            const vh = videoElement.videoHeight || 480;
+            if (effectsCanvas.width !== vw) effectsCanvas.width = vw;
+            if (effectsCanvas.height !== vh) effectsCanvas.height = vh;
+
+            effectsCtx.clearRect(0, 0, vw, vh);
+
+            // Apply the CSS color filter before drawing the base video
+            effectsCtx.filter = videoElement.style.filter || 'none';
+
+            switch (activeEffect) {
+                case 'glitter': renderGlitter(vw, vh); break;
+                case 'mirror': renderMirror(vw, vh); break;
+                case 'kaleidoscope': renderKaleidoscope(vw, vh); break;
+                case 'vhs': renderVHS(vw, vh); break;
+                case 'rgbsplit': renderRGBSplit(vw, vh); break;
+                case 'pixelate': renderPixelate(vw, vh); break;
+                case 'lightleak': renderLightLeak(vw, vh); break;
+                case 'specs': renderSpecs(vw, vh); break;
+            }
+
+            effectsCtx.filter = 'none';
+
+            // Throttle to ~30fps
+            setTimeout(() => {
+                effectAnimId = requestAnimationFrame(renderEffectsLoop);
+            }, 33);
+        }
+
+        // === Effect Implementations ===
+
+        // Glitter: sparkle particles floating over the video
+        function renderGlitter(w, h) {
+            effectsCtx.drawImage(videoElement, 0, 0, w, h);
+            effectsCtx.filter = 'none';
+
+            // Spawn new particles
+            if (glitterParticles.length < 60) {
+                glitterParticles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    size: Math.random() * 4 + 2,
+                    opacity: Math.random(),
+                    speed: Math.random() * 1.5 + 0.5,
+                    hue: Math.random() * 60 + 30 // gold/yellow range
+                });
+            }
+
+            // Draw & update particles
+            glitterParticles.forEach((p, i) => {
+                p.y -= p.speed;
+                p.opacity = 0.5 + 0.5 * Math.sin(Date.now() * 0.005 + i);
+                if (p.y < -10) {
+                    p.y = h + 10;
+                    p.x = Math.random() * w;
+                }
+
+                effectsCtx.save();
+                effectsCtx.globalAlpha = p.opacity;
+                effectsCtx.fillStyle = `hsl(${p.hue}, 100%, 80%)`;
+                effectsCtx.shadowColor = `hsl(${p.hue}, 100%, 70%)`;
+                effectsCtx.shadowBlur = 8;
+
+                // Draw a 4-pointed star
+                const cx = p.x, cy = p.y, s = p.size;
+                effectsCtx.beginPath();
+                for (let j = 0; j < 4; j++) {
+                    const angle = (j * Math.PI) / 2;
+                    effectsCtx.moveTo(cx, cy);
+                    effectsCtx.lineTo(cx + Math.cos(angle) * s, cy + Math.sin(angle) * s);
+                }
+                effectsCtx.stroke();
+                effectsCtx.fillRect(cx - 1, cy - 1, 2, 2);
+                effectsCtx.restore();
+            });
+        }
+
+        // Mirror: left half duplicated to right
+        function renderMirror(w, h) {
+            // Draw left half normally
+            effectsCtx.drawImage(videoElement, 0, 0, w / 2, h, 0, 0, w / 2, h);
+            // Draw left half flipped to right
+            effectsCtx.save();
+            effectsCtx.translate(w, 0);
+            effectsCtx.scale(-1, 1);
+            effectsCtx.drawImage(videoElement, 0, 0, w / 2, h, 0, 0, w / 2, h);
+            effectsCtx.restore();
+        }
+
+        // Kaleidoscope: 4-way mirrored pattern
+        function renderKaleidoscope(w, h) {
+            const halfW = w / 2, halfH = h / 2;
+            // Top-left: normal
+            effectsCtx.drawImage(videoElement, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+            // Top-right: flipped horizontally
+            effectsCtx.save();
+            effectsCtx.translate(w, 0);
+            effectsCtx.scale(-1, 1);
+            effectsCtx.drawImage(videoElement, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+            effectsCtx.restore();
+            // Bottom-left: flipped vertically
+            effectsCtx.save();
+            effectsCtx.translate(0, h);
+            effectsCtx.scale(1, -1);
+            effectsCtx.drawImage(videoElement, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+            effectsCtx.restore();
+            // Bottom-right: flipped both
+            effectsCtx.save();
+            effectsCtx.translate(w, h);
+            effectsCtx.scale(-1, -1);
+            effectsCtx.drawImage(videoElement, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+            effectsCtx.restore();
+        }
+
+        // VHS: scanlines + color offset + noise
+        function renderVHS(w, h) {
+            // Draw with slight vertical jitter
+            const jitter = Math.random() * 4 - 2;
+            effectsCtx.drawImage(videoElement, 0, jitter, w, h);
+            effectsCtx.filter = 'none';
+
+            // Scanlines
+            effectsCtx.fillStyle = 'rgba(0,0,0,0.08)';
+            for (let y = 0; y < h; y += 3) {
+                effectsCtx.fillRect(0, y, w, 1);
+            }
+
+            // Random noise blocks
+            for (let i = 0; i < 8; i++) {
+                const ny = Math.random() * h;
+                const nw = Math.random() * w * 0.3 + 20;
+                effectsCtx.fillStyle = `rgba(255,255,255,${Math.random() * 0.06})`;
+                effectsCtx.fillRect(Math.random() * w, ny, nw, 2);
+            }
+
+            // Color tint overlay
+            effectsCtx.globalCompositeOperation = 'overlay';
+            effectsCtx.fillStyle = 'rgba(255, 100, 50, 0.08)';
+            effectsCtx.fillRect(0, 0, w, h);
+            effectsCtx.globalCompositeOperation = 'source-over';
+        }
+
+        // RGB Split: offset red and blue channels
+        function renderRGBSplit(w, h) {
+            const offset = 6;
+            // Draw red channel shifted left
+            effectsCtx.globalCompositeOperation = 'source-over';
+            effectsCtx.drawImage(videoElement, 0, 0, w, h);
+
+            effectsCtx.globalCompositeOperation = 'multiply';
+            effectsCtx.fillStyle = 'cyan';
+            effectsCtx.fillRect(0, 0, w, h);
+
+            effectsCtx.globalCompositeOperation = 'lighter';
+            effectsCtx.filter = videoElement.style.filter || 'none';
+            effectsCtx.drawImage(videoElement, offset, 0, w, h);
+            effectsCtx.globalCompositeOperation = 'multiply';
+            effectsCtx.fillStyle = 'red';
+            effectsCtx.fillRect(0, 0, w, h);
+
+            effectsCtx.globalCompositeOperation = 'lighter';
+            effectsCtx.filter = videoElement.style.filter || 'none';
+            effectsCtx.drawImage(videoElement, -offset, 0, w, h);
+            effectsCtx.globalCompositeOperation = 'multiply';
+            effectsCtx.fillStyle = 'blue';
+            effectsCtx.fillRect(0, 0, w, h);
+
+            effectsCtx.globalCompositeOperation = 'source-over';
+            effectsCtx.filter = 'none';
+        }
+
+        // Pixelate: mosaic block effect
+        function renderPixelate(w, h) {
+            const blockSize = 12;
+            // Draw small then scale up for pixelation
+            const smallW = Math.ceil(w / blockSize);
+            const smallH = Math.ceil(h / blockSize);
+            effectsCtx.imageSmoothingEnabled = false;
+            effectsCtx.drawImage(videoElement, 0, 0, smallW, smallH);
+            effectsCtx.drawImage(effectsCanvas, 0, 0, smallW, smallH, 0, 0, w, h);
+            effectsCtx.imageSmoothingEnabled = true;
+        }
+
+        // Light Leak: warm gradient overlay
+        function renderLightLeak(w, h) {
+            effectsCtx.drawImage(videoElement, 0, 0, w, h);
+            effectsCtx.filter = 'none';
+
+            // Animated gradient position
+            const t = Date.now() * 0.001;
+            const x1 = w * (0.3 + 0.2 * Math.sin(t * 0.5));
+            const y1 = h * (0.2 + 0.2 * Math.cos(t * 0.3));
+
+            const grad = effectsCtx.createRadialGradient(x1, y1, 0, x1, y1, w * 0.7);
+            grad.addColorStop(0, 'rgba(255, 180, 80, 0.35)');
+            grad.addColorStop(0.4, 'rgba(255, 100, 120, 0.15)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            effectsCtx.globalCompositeOperation = 'screen';
+            effectsCtx.fillStyle = grad;
+            effectsCtx.fillRect(0, 0, w, h);
+            effectsCtx.globalCompositeOperation = 'source-over';
+        }
         // Initialize camera
         let stream = null;
         async function initCamera() {
