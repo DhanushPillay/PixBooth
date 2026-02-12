@@ -537,17 +537,32 @@
             const intensity = filters.intensity / 100;
 
             switch (filters.preset) {
-                case 'sepia':
-                    filterString += `sepia(${0.8 * intensity}) `;
+                case 'vintage':
+                    filterString += `sepia(${0.35 * intensity}) contrast(${1 + 0.1 * intensity}) brightness(${1 + 0.05 * intensity}) saturate(${1 + 0.15 * intensity}) `;
+                    break;
+                case 'golden':
+                    filterString += `brightness(${1 + 0.12 * intensity}) saturate(${1 + 0.3 * intensity}) sepia(${0.2 * intensity}) hue-rotate(${-10 * intensity}deg) `;
+                    break;
+                case 'film':
+                    filterString += `contrast(${1 + 0.15 * intensity}) brightness(${1 - 0.05 * intensity}) saturate(${1 - 0.15 * intensity}) sepia(${0.15 * intensity}) `;
+                    break;
+                case 'dreamy':
+                    filterString += `brightness(${1 + 0.15 * intensity}) contrast(${1 - 0.1 * intensity}) saturate(${1 + 0.1 * intensity}) `;
                     break;
                 case 'noir':
-                    filterString += `grayscale(${1 * intensity}) `;
+                    filterString += `grayscale(${1 * intensity}) contrast(${1 + 0.25 * intensity}) brightness(${1 - 0.05 * intensity}) `;
                     break;
-                case 'vivid':
-                    filterString += `contrast(${1 + 0.5 * intensity}) saturate(${1 + 0.2 * intensity}) `;
+                case 'cyberpunk':
+                    filterString += `contrast(${1 + 0.2 * intensity}) saturate(${1 + 0.5 * intensity}) hue-rotate(${270 * intensity}deg) brightness(${1 + 0.05 * intensity}) `;
                     break;
-                case 'cool':
-                    filterString += `brightness(${1 + 0.2 * intensity}) hue-rotate(${180 * intensity}deg) `;
+                case 'arctic':
+                    filterString += `brightness(${1 + 0.1 * intensity}) saturate(${1 - 0.2 * intensity}) hue-rotate(${190 * intensity}deg) contrast(${1 + 0.05 * intensity}) `;
+                    break;
+                case 'fade':
+                    filterString += `contrast(${1 - 0.15 * intensity}) brightness(${1 + 0.15 * intensity}) saturate(${1 - 0.3 * intensity}) sepia(${0.1 * intensity}) `;
+                    break;
+                case 'vibrant':
+                    filterString += `saturate(${1 + 0.6 * intensity}) contrast(${1 + 0.15 * intensity}) brightness(${1 + 0.05 * intensity}) `;
                     break;
             }
 
@@ -684,7 +699,7 @@
                 const randomContrast = Math.floor(Math.random() * 201) - 100;
                 const randomSaturation = Math.floor(Math.random() * 201) - 100;
 
-                const presetNames = ['none', 'sepia', 'noir', 'vivid', 'cool'];
+                const presetNames = ['none', 'vintage', 'golden', 'film', 'dreamy', 'noir', 'cyberpunk', 'arctic', 'fade', 'vibrant'];
                 const randomPreset = presetNames[Math.floor(Math.random() * presetNames.length)];
 
                 filters.brightness = randomBrightness;
