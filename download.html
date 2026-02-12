@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Your Photo Strip</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e7b923",
+                        "background-light": "rgb(176, 236, 181)",
+                        "background-dark": "rgb(176, 236, 181)",
+                        "surface-light": "#f3f0e7",
+                        "surface-dark": "#2a261c",
+                        "text-light": "#1b180e",
+                        "text-dark": "#f3f0e7",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft-lg': '0 8px 30px rgba(0, 0, 0, 0.08)',
+                        'soft-xl': '0 12px 40px rgba(0, 0, 0, 0.1)'
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body class="font-display">
+    <div
+        class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <div class="px-4 sm:px-6 md:px-10 lg:px-20 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col max-w-[960px] w-full flex-1 items-center">
+                    <div class="flex flex-wrap justify-center gap-3 p-4 text-center">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Your
+                            Photo Strip</h1>
+                    </div>
+                    <div class="w-full flex justify-center p-4">
+                        <div id="photoStripContainer" class="flex flex-col items-center gap-4 p-4 w-full">
+                            <!-- Photos will be dynamically generated here -->
+                        </div>
+                    </div>
+                    <div class="flex justify-center w-full mt-4">
+                        <div
+                            class="flex flex-col sm:flex-row flex-1 flex-wrap justify-center gap-3 px-4 py-3 max-w-[480px]">
+                            <button id="editFiltersBtn"
+                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-80 dark:hover:bg-opacity-80">
+                                <span class="truncate">Edit Filters</span>
+                            </button>
+                            <a href="home.html"
+                                class="flex min-w-[84px] w-full sm:w-auto sm:max-w-[480px] grow cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 sm:h-10 px-4 bg-transparent text-text-light dark:text-text-dark text-sm font-bold leading-normal tracking-[0.015em] border border-surface-light dark:border-surface-dark hover:bg-surface-light/50 dark:hover:bg-surface-dark/50">
+                                <span class="truncate">Start New Session</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-medium text-text-light dark:text-text-dark mb-3">Strip Color</h3>
+                        <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-primary shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFFFFF" style="background-color: #FFFFFF;" title="Classic White"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFE5EC" style="background-color: #FFE5EC;" title="Light Pink"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFF0F5" style="background-color: #FFF0F5;" title="Lavender Blush"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E6F3FF" style="background-color: #E6F3FF;" title="Baby Blue"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E0F7FA" style="background-color: #E0F7FA;" title="Light Cyan"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#D4F1F4" style="background-color: #D4F1F4;" title="Mint Green"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E8F5E9" style="background-color: #E8F5E9;" title="Pale Green"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFF9C4" style="background-color: #FFF9C4;" title="Pale Yellow"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFF3E0" style="background-color: #FFF3E0;" title="Peach"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FCE4EC" style="background-color: #FCE4EC;" title="Rose"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#F3E5F5" style="background-color: #F3E5F5;" title="Lilac"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#EDE7F6" style="background-color: #EDE7F6;" title="Periwinkle"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E8EAF6" style="background-color: #E8EAF6;" title="Lavender"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFEBEE" style="background-color: #FFEBEE;" title="Blush"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FBE9E7" style="background-color: #FBE9E7;" title="Coral"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#FFF8E1" style="background-color: #FFF8E1;" title="Cream"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#F1F8E9" style="background-color: #F1F8E9;" title="Lime"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E0F2F1" style="background-color: #E0F2F1;" title="Teal"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#E1F5FE" style="background-color: #E1F5FE;" title="Sky Blue"></button>
+                            <button
+                                class="color-option w-12 h-12 rounded-lg border-2 border-transparent shadow-md hover:scale-110 transition-transform"
+                                data-color="#F9FBE7" style="background-color: #F9FBE7;" title="Pale Lime"></button>
+                        </div>
+                        <button id="addEmojiBtn"
+                            class="w-full flex cursor-pointer items-center justify-center gap-x-2 rounded-xl bg-surface-light dark:bg-surface-dark px-4 py-3 sm:py-2 hover:bg-opacity-80 dark:hover:bg-opacity-80">
+                            <span
+                                class="material-symbols-outlined text-text-light dark:text-text-dark">add_reaction</span>
+                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal">Add Emoji
+                            </p>
+                        </button>
+                    </div>
+                    <div class="flex px-4 py-3 justify-center w-full mt-4">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full max-w-[480px] items-stretch sm:items-center">
+                            <select id="formatSelect"
+                                class="rounded-lg border px-3 py-3 sm:py-2 bg-white dark:bg-background-dark text-sm">
+                                <option value="png">PNG (lossless)</option>
+                                <option value="jpeg">JPEG (compressed)</option>
+                            </select>
+
+                            <button id="downloadBtn"
+                                class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 sm:h-12 px-5 bg-primary text-text-light dark:text-text-dark gap-2 text-base font-bold leading-normal tracking-[0.015em] hover:brightness-110">
+                                <span
+                                    class="material-symbols-outlined text-text-light dark:text-text-dark">download</span>
+                                <span class="truncate">Download Photo Strip</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center text-sm text-text-light/60 dark:text-text-dark/60">
+                        <p>Thank you for using PixBooth!</p>
+                        <a class="underline hover:text-primary" href="#">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Edit Modal -->
+    <div id="filterModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-background-light dark:bg-background-dark rounded-xl shadow-soft-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-surface-light dark:border-surface-dark flex items-center justify-between">
+                <h2 class="text-xl font-bold text-text-light dark:text-text-dark">Edit Filters</h2>
+                <button id="closeModalBtn" class="text-text-light dark:text-text-dark hover:text-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1">
+                <!-- Filter Presets -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-text-light/80 dark:text-text-dark/80 mb-3">Filter Presets</h3>
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <div class="filter-preset flex-shrink-0 cursor-pointer" data-filter="none">
+                            <div
+                                class="w-20 h-20 rounded-lg bg-gray-400 border-2 border-primary flex items-center justify-center">
+                                <span class="text-xs font-bold">Original</span>
+                            </div>
+                            <p class="text-xs text-center mt-1">None</p>
+                        </div>
+                        <div class="filter-preset flex-shrink-0 cursor-pointer" data-filter="sepia">
+                            <div class="w-20 h-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                style="filter: sepia(0.8);">
+                                <span class="text-xs font-bold">S</span>
+                            </div>
+                            <p class="text-xs text-center mt-1">Sepia</p>
+                        </div>
+                        <div class="filter-preset flex-shrink-0 cursor-pointer" data-filter="noir">
+                            <div class="w-20 h-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                style="filter: grayscale(1);">
+                                <span class="text-xs font-bold">N</span>
+                            </div>
+                            <p class="text-xs text-center mt-1">B&W</p>
+                        </div>
+                        <div class="filter-preset flex-shrink-0 cursor-pointer" data-filter="vivid">
+                            <div class="w-20 h-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                style="filter: saturate(1.5) contrast(1.2);">
+                                <span class="text-xs font-bold">V</span>
+                            </div>
+                            <p class="text-xs text-center mt-1">Vivid</p>
+                        </div>
+                        <div class="filter-preset flex-shrink-0 cursor-pointer" data-filter="vintage">
+                            <div class="w-20 h-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                style="filter: sepia(0.5) contrast(0.8);">
+                                <span class="text-xs font-bold">Vin</span>
+                            </div>
+                            <p class="text-xs text-center mt-1">Vintage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Adjustments -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-medium text-text-light/80 dark:text-text-dark/80 mb-3">Manual Adjustments
+                    </h3>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-medium">Brightness</label>
+                            <span id="modalBrightnessValue"
+                                class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                        </div>
+                        <input id="modalBrightnessSlider" type="range" min="-100" max="100" value="0"
+                            class="w-full h-1 bg-surface-light dark:bg-surface-dark rounded-full appearance-none cursor-pointer accent-primary">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-medium">Contrast</label>
+                            <span id="modalContrastValue"
+                                class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                        </div>
+                        <input id="modalContrastSlider" type="range" min="-100" max="100" value="0"
+                            class="w-full h-1 bg-surface-light dark:bg-surface-dark rounded-full appearance-none cursor-pointer accent-primary">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-medium">Saturation</label>
+                            <span id="modalSaturationValue"
+                                class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                        </div>
+                        <input id="modalSaturationSlider" type="range" min="-100" max="100" value="0"
+                            class="w-full h-1 bg-surface-light dark:bg-surface-dark rounded-full appearance-none cursor-pointer accent-primary">
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-surface-light dark:border-surface-dark flex gap-3">
+                <button id="resetFiltersBtn"
+                    class="flex-1 rounded-xl px-4 py-2 text-sm font-medium bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark hover:bg-opacity-80">
+                    Reset
+                </button>
+                <button id="applyFiltersBtn"
+                    class="flex-1 rounded-xl px-4 py-2 text-sm font-medium bg-primary text-text-light dark:text-text-dark hover:brightness-110">
+                    Apply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emoji Edit Controls -->
+    <div id="emojiEditControls"
+        class="hidden fixed bottom-4 sm:bottom-20 left-1/2 transform -translate-x-1/2 bg-white dark:bg-background-dark rounded-xl shadow-2xl p-3 sm:p-4 z-40 border border-primary max-w-[95vw]">
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <div class="flex flex-col gap-2">
+                <label class="text-xs font-medium">Size</label>
+                <input id="emojiSizeSlider" type="range" min="24" max="120" value="48"
+                    class="w-32 h-1 bg-surface-light dark:bg-surface-dark rounded-full appearance-none cursor-pointer accent-primary">
+                <span id="emojiSizeValue" class="text-xs text-center">48px</span>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button id="changeEmojiBtn"
+                    class="flex-1 sm:flex-none rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-primary text-text-light dark:text-text-dark hover:brightness-110">
+                    Change
+                </button>
+                <button id="deleteEmojiBtn"
+                    class="flex-1 sm:flex-none rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-red-500 text-white hover:brightness-110">
+                    Delete
+                </button>
+                <button id="doneEditingBtn"
+                    class="flex-1 sm:flex-none rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark hover:bg-opacity-80">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emoji Picker Modal -->
+    <div id="emojiModal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-background-light dark:bg-background-dark rounded-xl shadow-soft-xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-surface-light dark:border-surface-dark flex items-center justify-between">
+                <h2 class="text-xl font-bold text-text-light dark:text-text-dark">Add Emoji</h2>
+                <button id="closeEmojiModalBtn" class="text-text-light dark:text-text-dark hover:text-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1">
+                <p class="text-sm text-text-light/60 dark:text-text-dark/60 mb-4">Click an emoji, then click on the
+                    photo strip to place it</p>
+                <div class="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="😊">😊</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="😂">😂</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🥰">🥰</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="😎">😎</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🤩">🤩</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="😍">😍</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🥳">🥳</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎉">🎉</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="❤️">❤️</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💕">💕</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💖">💖</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="✨">✨</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="⭐">⭐</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌟">🌟</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💫">💫</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎈">🎈</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎊">🎊</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎁">🎁</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎂">🎂</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎀">🎀</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌈">🌈</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="☀️">☀️</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌸">🌸</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌺">🌺</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌹">🌹</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌻">🌻</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🦋">🦋</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🐶">🐶</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🐱">🐱</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🐻">🐻</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🐼">🐼</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🔥">🔥</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💯">💯</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="👑">👑</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💎">💎</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎵">🎵</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎶">🎶</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🎤">🎤</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="📸">📸</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="🌙">🌙</button>
+                    <button
+                        class="emoji-btn text-3xl hover:scale-125 transition-transform p-2 rounded-lg hover:bg-surface-light dark:hover:bg-surface-dark"
+                        data-emoji="💜">💜</button>
+                </div>
+            </div>
+            <div class="p-4 border-t border-surface-light dark:border-surface-dark flex gap-3">
+                <button id="clearEmojisBtn"
+                    class="flex-1 rounded-xl px-4 py-2 text-sm font-medium bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark hover:bg-opacity-80">
+                    Clear All Emojis
+                </button>
+                <button id="doneEmojiBtn"
+                    class="flex-1 rounded-xl px-4 py-2 text-sm font-medium bg-primary text-text-light dark:text-text-dark hover:brightness-110">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Get layout and photos from localStorage
+        let layoutData = JSON.parse(localStorage.getItem('selectedLayout'));
+        let capturedPhotos = JSON.parse(localStorage.getItem('capturedPhotos'));
+
+        // If no data, use demo data for testing
+        if (!layoutData || !capturedPhotos) {
+            layoutData = {
+                layout: 'strip3',
+                rows: 3,
+                cols: 1,
+                name: 'Strip 3'
+            };
+            capturedPhotos = [
+                { id: 0, placeholder: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23e0e0e0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="32" fill="%23666"%3EPhoto 1%3C/text%3E%3C/svg%3E', filters: {} },
+                { id: 1, placeholder: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23d0d0d0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="32" fill="%23666"%3EPhoto 2%3C/text%3E%3C/svg%3E', filters: {} },
+                { id: 2, placeholder: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23c0c0c0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="32" fill="%23666"%3EPhoto 3%3C/text%3E%3C/svg%3E', filters: {} }
+            ];
+        }
+
+        const container = document.getElementById('photoStripContainer');
+
+        // Customization state
+        let currentFilters = {
+            brightness: 0,
+            contrast: 0,
+            saturation: 0,
+            preset: 'none'
+        };
+
+        let stripColor = '#FFFFFF';
+        let emojis = []; // Array to store emoji positions and types
+        let selectedEmoji = null;
+        let emojiPlacementMode = false;
+        let selectedEmojiForEdit = null;
+
+        // Generate photo strip based on layout
+        function renderPhotoStrip() {
+            container.innerHTML = '';
+
+            // Create outer strip container with selected color and white border
+            const stripContainer = document.createElement('div');
+            stripContainer.className = 'bg-white p-4 rounded-2xl shadow-2xl';
+            stripContainer.style.maxWidth = '380px';
+
+            // Inner colored background
+            const innerContainer = document.createElement('div');
+            innerContainer.className = 'p-6 rounded-xl';
+            innerContainer.style.backgroundColor = stripColor;
+
+            // Create wrapper for positioning emojis
+            const stripWrapper = document.createElement('div');
+            stripWrapper.className = 'relative';
+            stripWrapper.id = 'stripWrapper';
+
+            if (layoutData.layout === 'strip3' || layoutData.layout === 'strip4') {
+                // Vertical strip layout
+                stripWrapper.className = 'relative flex flex-col gap-3';
+                capturedPhotos.forEach((photo, index) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = getFrameClass();
+
+                    const img = document.createElement('img');
+                    img.src = photo.placeholder;
+                    img.className = 'w-full aspect-square object-cover rounded-xl object-top';
+                    img.style.filter = getFilterString();
+                    img.style.objectPosition = 'center 20%';
+
+                    wrapper.appendChild(img);
+                    stripWrapper.appendChild(wrapper);
+                });
+
+                // Add footer with date and branding
+                const footer = document.createElement('div');
+                footer.className = 'mt-4 pt-4 border-t-2 border-white/30 flex justify-between items-center text-sm';
+                footer.style.color = 'rgba(0,0,0,0.6)';
+
+                const date = new Date();
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                footer.innerHTML = `
+                <span class="font-medium">${dateStr}</span>
+                <span class="font-bold">PixBooth</span>
+            `;
+                stripWrapper.appendChild(footer);
+            } else if (layoutData.layout === 'grid2x2') {
+                // 2x2 Grid layout
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'grid grid-cols-2 gap-3 ' + getFrameClass();
+
+                capturedPhotos.forEach((photo, index) => {
+                    const img = document.createElement('img');
+                    img.src = photo.placeholder;
+                    img.className = 'w-full aspect-square object-cover rounded-xl';
+                    img.style.filter = getFilterString();
+                    gridDiv.appendChild(img);
+                });
+
+                stripWrapper.appendChild(gridDiv);
+
+                // Add footer
+                const gridFooter = document.createElement('div');
+                gridFooter.className = 'mt-4 pt-4 border-t-2 border-white/30 flex justify-between items-center text-sm';
+                gridFooter.style.color = 'rgba(0,0,0,0.6)';
+                const gridDate = new Date();
+                const gridDateStr = gridDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                gridFooter.innerHTML = `
+                <span class="font-medium">${gridDateStr}</span>
+                <span class="font-bold">PixBooth</span>
+            `;
+                stripWrapper.appendChild(gridFooter);
+            } else if (layoutData.layout === 'row3') {
+                // Horizontal row layout - adjust for horizontal display
+                stripContainer.style.maxWidth = '650px';
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex gap-2 ' + getFrameClass();
+
+                capturedPhotos.forEach((photo, index) => {
+                    const img = document.createElement('img');
+                    img.src = photo.placeholder;
+                    img.className = 'flex-1 aspect-square object-cover rounded-xl';
+                    img.style.filter = getFilterString();
+                    rowDiv.appendChild(img);
+                });
+
+                stripWrapper.appendChild(rowDiv);
+
+                // Add footer
+                const rowFooter = document.createElement('div');
+                rowFooter.className = 'mt-4 pt-4 border-t-2 border-white/30 flex justify-between items-center text-sm';
+                rowFooter.style.color = 'rgba(0,0,0,0.6)';
+                const rowDate = new Date();
+                const rowDateStr = rowDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                rowFooter.innerHTML = `
+                <span class="font-medium">${rowDateStr}</span>
+                <span class="font-bold">PixBooth</span>
+            `;
+                stripWrapper.appendChild(rowFooter);
+            }
+
+            // Add emojis
+            emojis.forEach(emoji => {
+                const emojiEl = document.createElement('div');
+                const size = emoji.size || 48;
+                emojiEl.className = 'absolute cursor-move select-none hover:ring-2 hover:ring-primary rounded';
+                emojiEl.style.left = emoji.x + 'px';
+                emojiEl.style.top = emoji.y + 'px';
+                emojiEl.style.fontSize = size + 'px';
+                emojiEl.style.transition = 'none';
+                emojiEl.style.willChange = 'left, top';
+                emojiEl.textContent = emoji.emoji;
+                emojiEl.draggable = false;
+                emojiEl.dataset.emojiId = emoji.id;
+
+                // Highlight if selected
+                if (selectedEmojiForEdit && selectedEmojiForEdit.id === emoji.id) {
+                    emojiEl.classList.add('ring-2', 'ring-primary');
+                }
+
+                // Make emoji draggable with smooth drag events
+                let currentDrag = null;
+
+                emojiEl.addEventListener('pointerdown', (e) => {
+                    const rect = stripWrapper.getBoundingClientRect();
+                    currentDrag = {
+                        emoji: emoji,
+                        element: emojiEl,
+                        startX: e.clientX,
+                        startY: e.clientY,
+                        offsetX: e.clientX - rect.left - emoji.x,
+                        offsetY: e.clientY - rect.top - emoji.y,
+                        moved: false
+                    };
+                    emojiEl.style.zIndex = '1000';
+                    emojiEl.style.cursor = 'grabbing';
+                    emojiEl.style.touchAction = 'none';
+                    emojiEl.setPointerCapture(e.pointerId);
+                    document.body.style.userSelect = 'none';
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+
+                const handlePointerMove = (e) => {
+                    if (currentDrag && currentDrag.emoji.id === emoji.id) {
+                        const rect = stripWrapper.getBoundingClientRect();
+                        const newX = e.clientX - rect.left - currentDrag.offsetX;
+                        const newY = e.clientY - rect.top - currentDrag.offsetY;
+
+                        currentDrag.emoji.x = newX;
+                        currentDrag.emoji.y = newY;
+                        currentDrag.element.style.left = newX + 'px';
+                        currentDrag.element.style.top = newY + 'px';
+
+                        const movedDistance = Math.sqrt(
+                            Math.pow(e.clientX - currentDrag.startX, 2) +
+                            Math.pow(e.clientY - currentDrag.startY, 2)
+                        );
+                        if (movedDistance > 5) {
+                            currentDrag.moved = true;
+                        }
+                    }
+                };
+
+                const handlePointerUp = (e) => {
+                    if (currentDrag && currentDrag.emoji.id === emoji.id) {
+                        currentDrag.element.style.zIndex = 'auto';
+                        currentDrag.element.style.cursor = 'move';
+                        document.body.style.userSelect = '';
+
+                        // If moved less than 5 pixels, treat as click
+                        if (!currentDrag.moved) {
+                            selectedEmojiForEdit = emoji;
+                            showEmojiEditControls();
+                            renderPhotoStrip();
+                        }
+
+                        currentDrag = null;
+                    }
+                };
+
+                document.addEventListener('pointermove', handlePointerMove, { passive: true });
+                document.addEventListener('pointerup', handlePointerUp);
+
+                // Double click to remove emoji
+                emojiEl.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    emojis = emojis.filter(e => e.id !== emoji.id);
+                    selectedEmojiForEdit = null;
+                    hideEmojiEditControls();
+                    renderPhotoStrip();
+                });
+
+                stripWrapper.appendChild(emojiEl);
+            });
+
+            innerContainer.appendChild(stripWrapper);
+            stripContainer.appendChild(innerContainer);
+            container.appendChild(stripContainer);
+
+            // Add click handler for emoji placement
+            if (emojiPlacementMode && selectedEmoji) {
+                stripWrapper.style.cursor = 'crosshair';
+                stripWrapper.addEventListener('click', handleEmojiPlacement);
+            }
+
+        }
+
+        // Handle emoji placement
+        function handleEmojiPlacement(e) {
+            if (!selectedEmoji) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left - 20; // Center emoji on click
+            const y = e.clientY - rect.top - 20;
+
+            emojis.push({
+                id: Date.now() + Math.random(),
+                emoji: selectedEmoji,
+                x: x,
+                y: y,
+                size: 48
+            });
+
+            renderPhotoStrip();
+        }
+
+        // Get frame classes - simple spacing only
+        function getFrameClass() {
+            return 'flex items-center justify-center mb-2';
+        }
+
+        // Get filter string from current settings
+        function getFilterString() {
+            let filter = '';
+
+            // Apply preset
+            switch (currentFilters.preset) {
+                case 'sepia':
+                    filter += 'sepia(0.8) ';
+                    break;
+                case 'noir':
+                    filter += 'grayscale(1) ';
+                    break;
+                case 'vivid':
+                    filter += 'saturate(1.5) contrast(1.2) ';
+                    break;
+                case 'vintage':
+                    filter += 'sepia(0.5) contrast(0.8) ';
+                    break;
+            }
+
+            // Apply manual adjustments
+            const brightness = 1 + (currentFilters.brightness / 100);
+            const contrast = 1 + (currentFilters.contrast / 100);
+            const saturation = 1 + (currentFilters.saturation / 100);
+
+            filter += `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`;
+
+            return filter;
+        }
+
+        // Initial render
+        renderPhotoStrip();
+
+        // Update page title with layout name
+        const titleElement = document.querySelector('h1');
+        if (titleElement) {
+            titleElement.textContent = `Your ${layoutData.name} Photo Strip`;
+        }
+
+        // Color selection
+        const colorOptions = document.querySelectorAll('.color-option');
+
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active state from all
+                colorOptions.forEach(opt => {
+                    opt.classList.remove('border-primary');
+                    opt.classList.add('border-transparent');
+                });
+
+                // Add active state to selected
+                option.classList.remove('border-transparent');
+                option.classList.add('border-primary');
+
+                stripColor = option.dataset.color;
+                renderPhotoStrip();
+            });
+        });
+
+        // Emoji modal controls
+        const emojiModal = document.getElementById('emojiModal');
+        const addEmojiBtn = document.getElementById('addEmojiBtn');
+        const closeEmojiModalBtn = document.getElementById('closeEmojiModalBtn');
+        const doneEmojiBtn = document.getElementById('doneEmojiBtn');
+        const clearEmojisBtn = document.getElementById('clearEmojisBtn');
+        const emojiButtons = document.querySelectorAll('.emoji-btn');
+
+        // Open emoji modal
+        addEmojiBtn.addEventListener('click', () => {
+            emojiModal.classList.remove('hidden');
+        });
+
+        // Close emoji modal
+        closeEmojiModalBtn.addEventListener('click', () => {
+            emojiModal.classList.add('hidden');
+            emojiPlacementMode = false;
+            selectedEmoji = null;
+            renderPhotoStrip();
+        });
+
+        doneEmojiBtn.addEventListener('click', () => {
+            emojiModal.classList.add('hidden');
+            emojiPlacementMode = false;
+            selectedEmoji = null;
+            renderPhotoStrip();
+        });
+
+        emojiModal.addEventListener('click', (e) => {
+            if (e.target === emojiModal) {
+                emojiModal.classList.add('hidden');
+                emojiPlacementMode = false;
+                selectedEmoji = null;
+                renderPhotoStrip();
+            }
+        });
+
+        // Emoji selection
+        emojiButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedEmoji = btn.dataset.emoji;
+                emojiPlacementMode = true;
+
+                // Visual feedback
+                emojiButtons.forEach(b => b.classList.remove('bg-primary/20'));
+                btn.classList.add('bg-primary/20');
+
+                // Close modal and allow placement
+                emojiModal.classList.add('hidden');
+                renderPhotoStrip();
+
+                // Show instruction
+                const instruction = document.createElement('div');
+                instruction.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-full z-50';
+                instruction.textContent = 'Click on the photo strip to place emoji. Double-click emoji to remove.';
+                document.body.appendChild(instruction);
+
+                setTimeout(() => {
+                    instruction.remove();
+                }, 3000);
+            });
+        });
+
+        // Clear all emojis
+        clearEmojisBtn.addEventListener('click', () => {
+            emojis = [];
+            selectedEmojiForEdit = null;
+            hideEmojiEditControls();
+            renderPhotoStrip();
+        });
+
+        // Emoji edit controls
+        const emojiEditControls = document.getElementById('emojiEditControls');
+        const emojiSizeSlider = document.getElementById('emojiSizeSlider');
+        const emojiSizeValue = document.getElementById('emojiSizeValue');
+        const changeEmojiBtn = document.getElementById('changeEmojiBtn');
+        const deleteEmojiBtn = document.getElementById('deleteEmojiBtn');
+        const doneEditingBtn = document.getElementById('doneEditingBtn');
+
+        function showEmojiEditControls() {
+            if (selectedEmojiForEdit) {
+                emojiEditControls.classList.remove('hidden');
+                emojiSizeSlider.value = selectedEmojiForEdit.size || 48;
+                emojiSizeValue.textContent = (selectedEmojiForEdit.size || 48) + 'px';
+            }
+        }
+
+        function hideEmojiEditControls() {
+            emojiEditControls.classList.add('hidden');
+        }
+
+        // Size slider
+        emojiSizeSlider.addEventListener('input', (e) => {
+            const newSize = parseInt(e.target.value);
+            emojiSizeValue.textContent = newSize + 'px';
+            if (selectedEmojiForEdit) {
+                selectedEmojiForEdit.size = newSize;
+                renderPhotoStrip();
+            }
+        });
+
+        // Change emoji type
+        changeEmojiBtn.addEventListener('click', () => {
+            emojiModal.classList.remove('hidden');
+            emojiPlacementMode = false;
+        });
+
+        // Update emoji selection to change existing emoji if one is selected
+        emojiButtons.forEach(btn => {
+            const originalHandler = btn.onclick;
+            btn.onclick = null;
+        });
+
+        emojiButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const newEmoji = btn.dataset.emoji;
+
+                // If editing an existing emoji, change its type
+                if (selectedEmojiForEdit) {
+                    selectedEmojiForEdit.emoji = newEmoji;
+                    emojiModal.classList.add('hidden');
+                    renderPhotoStrip();
+                    return;
+                }
+
+                // Otherwise, normal placement mode
+                selectedEmoji = newEmoji;
+                emojiPlacementMode = true;
+
+                // Visual feedback
+                emojiButtons.forEach(b => b.classList.remove('bg-primary/20'));
+                btn.classList.add('bg-primary/20');
+
+                // Close modal and allow placement
+                emojiModal.classList.add('hidden');
+                renderPhotoStrip();
+
+                // Show instruction
+                const instruction = document.createElement('div');
+                instruction.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-full z-50';
+                instruction.textContent = 'Click on the photo strip to place emoji. Click emoji to edit.';
+                document.body.appendChild(instruction);
+
+                setTimeout(() => {
+                    instruction.remove();
+                }, 3000);
+            });
+        });
+
+        // Delete emoji
+        deleteEmojiBtn.addEventListener('click', () => {
+            if (selectedEmojiForEdit) {
+                emojis = emojis.filter(e => e.id !== selectedEmojiForEdit.id);
+                selectedEmojiForEdit = null;
+                hideEmojiEditControls();
+                renderPhotoStrip();
+            }
+        });
+
+        // Done editing
+        doneEditingBtn.addEventListener('click', () => {
+            selectedEmojiForEdit = null;
+            hideEmojiEditControls();
+            renderPhotoStrip();
+        });
+
+        // Click outside to deselect
+        document.addEventListener('click', (e) => {
+            if (!emojiEditControls.contains(e.target) &&
+                !e.target.closest('[data-emoji-id]') &&
+                !e.target.closest('#emojiModal')) {
+                selectedEmojiForEdit = null;
+                hideEmojiEditControls();
+                renderPhotoStrip();
+            }
+        });
+
+        // Filter modal controls
+        const filterModal = document.getElementById('filterModal');
+        const editFiltersBtn = document.getElementById('editFiltersBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+        const modalBrightnessSlider = document.getElementById('modalBrightnessSlider');
+        const modalContrastSlider = document.getElementById('modalContrastSlider');
+        const modalSaturationSlider = document.getElementById('modalSaturationSlider');
+
+        const modalBrightnessValue = document.getElementById('modalBrightnessValue');
+        const modalContrastValue = document.getElementById('modalContrastValue');
+        const modalSaturationValue = document.getElementById('modalSaturationValue');
+
+        const filterPresets = document.querySelectorAll('.filter-preset');
+
+        // Open modal
+        editFiltersBtn.addEventListener('click', () => {
+            filterModal.classList.remove('hidden');
+
+            // Set current values
+            modalBrightnessSlider.value = currentFilters.brightness;
+            modalContrastSlider.value = currentFilters.contrast;
+            modalSaturationSlider.value = currentFilters.saturation;
+
+            modalBrightnessValue.textContent = currentFilters.brightness;
+            modalContrastValue.textContent = currentFilters.contrast;
+            modalSaturationValue.textContent = currentFilters.saturation;
+
+            // Update preset selection
+            filterPresets.forEach(preset => {
+                const div = preset.querySelector('div');
+                if (preset.dataset.filter === currentFilters.preset) {
+                    div.classList.add('border-primary');
+                    div.classList.remove('border-transparent');
+                } else {
+                    div.classList.remove('border-primary');
+                    div.classList.add('border-transparent');
+                }
+            });
+        });
+
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            filterModal.classList.add('hidden');
+        });
+
+        filterModal.addEventListener('click', (e) => {
+            if (e.target === filterModal) {
+                filterModal.classList.add('hidden');
+            }
+        });
+
+        // Slider updates
+        modalBrightnessSlider.addEventListener('input', (e) => {
+            modalBrightnessValue.textContent = e.target.value;
+        });
+
+        modalContrastSlider.addEventListener('input', (e) => {
+            modalContrastValue.textContent = e.target.value;
+        });
+
+        modalSaturationSlider.addEventListener('input', (e) => {
+            modalSaturationValue.textContent = e.target.value;
+        });
+
+        // Preset selection
+        filterPresets.forEach(preset => {
+            preset.addEventListener('click', () => {
+                filterPresets.forEach(p => {
+                    p.querySelector('div').classList.remove('border-primary');
+                    p.querySelector('div').classList.add('border-transparent');
+                });
+
+                preset.querySelector('div').classList.remove('border-transparent');
+                preset.querySelector('div').classList.add('border-primary');
+            });
+        });
+
+        // Apply filters
+        applyFiltersBtn.addEventListener('click', () => {
+            currentFilters.brightness = parseInt(modalBrightnessSlider.value);
+            currentFilters.contrast = parseInt(modalContrastSlider.value);
+            currentFilters.saturation = parseInt(modalSaturationSlider.value);
+
+            // Get selected preset
+            const selectedPreset = document.querySelector('.filter-preset div.border-primary');
+            if (selectedPreset) {
+                currentFilters.preset = selectedPreset.parentElement.dataset.filter;
+            }
+
+            renderPhotoStrip();
+            filterModal.classList.add('hidden');
+        });
+
+        // Reset filters
+        resetFiltersBtn.addEventListener('click', () => {
+            currentFilters = {
+                brightness: 0,
+                contrast: 0,
+                saturation: 0,
+                preset: 'none'
+            };
+
+            modalBrightnessSlider.value = 0;
+            modalContrastSlider.value = 0;
+            modalSaturationSlider.value = 0;
+
+            modalBrightnessValue.textContent = '0';
+            modalContrastValue.textContent = '0';
+            modalSaturationValue.textContent = '0';
+
+            filterPresets.forEach(p => {
+                p.querySelector('div').classList.remove('border-primary');
+                p.querySelector('div').classList.add('border-transparent');
+            });
+            document.querySelector('[data-filter="none"] div').classList.add('border-primary');
+        });
+
+        // Helper function to draw rounded rectangle (polyfill for roundRect)
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        // Download functionality
+        const downloadBtn = document.getElementById('downloadBtn');
+        const formatSelect = document.getElementById('formatSelect');
+        downloadBtn.addEventListener('click', () => {
+            try {
+                // Use html2canvas alternative - capture the strip wrapper
+                const stripWrapper = document.getElementById('stripWrapper');
+
+                // Create a temporary canvas to render the final image
+                const tempCanvas = document.createElement('canvas');
+                const ctx = tempCanvas.getContext('2d');
+
+                // Set canvas size based on layout (with padding and footer space)
+                const outerPadding = 32; // White border padding
+                const innerPadding = 48; // Colored background padding
+                const footerHeight = 60; // Space for date and branding
+                const cornerRadius = 16;
+
+                let innerWidth, innerHeight;
+
+                if (layoutData.layout === 'strip3') {
+                    innerWidth = 350;
+                    innerHeight = (350 * 3) + 16 + footerHeight;
+                } else if (layoutData.layout === 'strip4') {
+                    innerWidth = 350;
+                    innerHeight = (350 * 4) + 24 + footerHeight;
+                } else if (layoutData.layout === 'grid2x2') {
+                    innerWidth = 700 + 8;
+                    innerHeight = 700 + 8 + footerHeight;
+                } else if (layoutData.layout === 'row3') {
+                    innerWidth = (350 * 3) + 16;
+                    innerHeight = 350 + footerHeight;
+                }
+
+                tempCanvas.width = innerWidth + (outerPadding * 2) + (innerPadding * 2);
+                tempCanvas.height = innerHeight + (outerPadding * 2) + (innerPadding * 2);
+
+                // Draw white background (outer border)
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+                // Draw colored background (inner area)
+                ctx.fillStyle = stripColor;
+                ctx.fillRect(outerPadding, outerPadding, innerWidth + (innerPadding * 2), innerHeight + (innerPadding * 2));
+
+                // Draw all photos with filters
+                const images = container.querySelectorAll('img');
+                let imagesLoaded = 0;
+                const totalImages = images.length;
+
+                images.forEach((img, index) => {
+                    const tempImg = new Image();
+                    tempImg.crossOrigin = 'anonymous';
+                    tempImg.src = img.src;
+
+                    tempImg.onload = () => {
+                        ctx.filter = getFilterString();
+
+                        const totalPadding = outerPadding + innerPadding;
+                        const photoAreaWidth = innerWidth;
+                        const photoAreaHeight = innerHeight - footerHeight;
+
+                        if (layoutData.layout === 'strip3' || layoutData.layout === 'strip4') {
+                            const gap = 12;
+                            const photoSize = (photoAreaHeight - (gap * (totalImages - 1))) / totalImages;
+                            const x = totalPadding;
+                            const y = totalPadding + ((photoSize + gap) * index);
+                            const w = photoAreaWidth;
+                            const h = photoSize;
+
+                            ctx.save();
+                            drawRoundedRect(ctx, x, y, w, h, cornerRadius);
+                            ctx.clip();
+                            ctx.drawImage(tempImg, x, y, w, h);
+                            ctx.restore();
+                        } else if (layoutData.layout === 'grid2x2') {
+                            const col = index % 2;
+                            const row = Math.floor(index / 2);
+                            const gap = 12;
+                            const x = totalPadding + (col * (photoAreaWidth / 2)) + (col * gap);
+                            const y = totalPadding + (row * (photoAreaHeight / 2)) + (row * gap);
+                            const w = (photoAreaWidth / 2) - gap;
+                            const h = (photoAreaHeight / 2) - gap;
+
+                            ctx.save();
+                            drawRoundedRect(ctx, x, y, w, h, cornerRadius);
+                            ctx.clip();
+                            ctx.drawImage(tempImg, x, y, w, h);
+                            ctx.restore();
+                        } else if (layoutData.layout === 'row3') {
+                            const photoWidth = photoAreaWidth / totalImages;
+                            const gap = 12;
+                            const x = totalPadding + (photoWidth * index) + (gap * index);
+                            const y = totalPadding;
+                            const w = photoWidth - gap;
+                            const h = photoAreaHeight;
+
+                            ctx.save();
+                            drawRoundedRect(ctx, x, y, w, h, cornerRadius);
+                            ctx.clip();
+                            ctx.drawImage(tempImg, x, y, w, h);
+                            ctx.restore();
+                        }
+
+                        imagesLoaded++;
+
+                        if (imagesLoaded === totalImages) {
+                            // Reset filter for emojis and footer
+                            ctx.filter = 'none';
+
+                            // Draw emojis
+                            const stripRect = stripWrapper.getBoundingClientRect();
+                            const scaleX = photoAreaWidth / stripRect.width;
+                            const scaleY = photoAreaHeight / stripRect.height;
+
+                            emojis.forEach(emoji => {
+                                const emojiSize = (emoji.size || 48) * Math.min(scaleX, scaleY);
+                                ctx.font = `${emojiSize}px Arial`;
+                                ctx.fillText(emoji.emoji, totalPadding + (emoji.x * scaleX), totalPadding + (emoji.y * scaleY) + (emojiSize * 0.8));
+                            });
+
+                            // Draw footer with date and branding
+                            const footerY = totalPadding + photoAreaHeight + 20;
+
+                            // Draw separator line
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.moveTo(totalPadding, footerY - 10);
+                            ctx.lineTo(totalPadding + photoAreaWidth, footerY - 10);
+                            ctx.stroke();
+
+                            // Draw date
+                            const date = new Date();
+                            const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                            ctx.font = '18px Inter, sans-serif';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(dateStr, totalPadding, footerY + 15);
+
+                            // Draw branding
+                            ctx.font = 'bold 18px Inter, sans-serif';
+                            ctx.textAlign = 'right';
+                            ctx.fillText('PixBooth', totalPadding + photoAreaWidth, footerY + 15);
+
+                            // Reset text align
+                            ctx.textAlign = 'left';
+
+                            // Download the image in selected format
+                            const selectedFormat = (formatSelect && formatSelect.value) ? formatSelect.value : 'jpeg';
+                            const filenameExt = selectedFormat === 'png' ? 'png' : 'jpg';
+                            let dataURL;
+                            if (selectedFormat === 'png') {
+                                dataURL = tempCanvas.toDataURL('image/png');
+                            } else {
+                                dataURL = tempCanvas.toDataURL('image/jpeg', 0.95);
+                            }
+
+                            const link = document.createElement('a');
+                            link.download = `photo-booth-${Date.now()}.${filenameExt}`;
+                            link.href = dataURL;
+                            link.click();
+                        }
+                    };
+                });
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Error downloading image. Please try again.');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

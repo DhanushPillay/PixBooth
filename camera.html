@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>PixBooth</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e7b923",
+                        "background-light": "rgb(176, 236, 181)",
+                        "background-dark": "rgb(176, 236, 181)",
+                        "text-light": "#1b180e",
+                        "text-dark": "#f8f8f6",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#374151"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e7b923;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4a71b;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark overflow-auto"
+    style="scrollbar-width: thin; scrollbar-color: #e7b923 rgba(0,0,0,0.1);">
+    <div class="relative flex h-screen w-full flex-col overflow-hidden">
+        <div class="flex flex-col lg:flex-row h-full min-h-0">
+            <!-- Main Content -->
+            <main class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto"
+                style="scrollbar-width: thin; scrollbar-color: #e7b923 rgba(0,0,0,0.1);">
+                <!-- Top Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4 pb-4">
+                    <a href="home.html"
+                        class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        <span class="hidden sm:inline">Choose Layout</span>
+                    </a>
+                    <p id="progressText"
+                        class="text-sm sm:text-base font-normal leading-normal text-text-light/80 dark:text-text-dark/80">
+                        Capturing: 0/4 photos</p>
+                    <button id="cameraSwitchBtn"
+                        class="hidden sm:flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                        <span class="material-symbols-outlined text-base">videocam</span>
+                        <span id="cameraLabel">Front Camera</span>
+                        <span class="material-symbols-outlined text-base">expand_more</span>
+                    </button>
+                </div>
+                <!-- Video Feed & Countdown -->
+                <div class="relative flex flex-1 items-center justify-center p-2 sm:p-4">
+                    <div class="relative w-full max-w-5xl rounded-xl border border-primary/50 shadow-lg"
+                        style="aspect-ratio: 4/3;">
+                        <video id="videoElement" autoplay playsinline
+                            class="h-full w-full rounded-xl object-cover"></video>
+                        <canvas id="captureCanvas" class="hidden"></canvas>
+                        <!-- Countdown Overlay -->
+                        <div id="countdownOverlay"
+                            class="absolute inset-0 hidden items-center justify-center rounded-xl bg-background-dark/80">
+                            <h1 id="countdownNumber" class="text-primary text-[16rem] font-bold leading-none"
+                                style="text-shadow: 0 4px 30px rgba(0,0,0,0.4);">3</h1>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bottom Section -->
+                <div class="flex flex-col items-center gap-6 pt-4">
+                    <!-- Captured Photos Gallery -->
+                    <div class="flex w-full max-w-5xl items-center gap-2 sm:gap-4">
+                        <button
+                            class="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black/5 transition-colors hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <div id="thumbnailGrid" class="grid flex-1 grid-cols-4 gap-2 sm:gap-4">
+                            <!-- Thumbnails will be dynamically generated here -->
+                        </div>
+                        <button
+                            class="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black/5 transition-colors hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                    <!-- Action Bar -->
+                    <div class="flex w-full max-w-5xl items-center justify-between gap-2">
+                        <button id="toggleFiltersBtn"
+                            class="hidden sm:flex items-center gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                            <span class="material-symbols-outlined text-base">tune</span>
+                            <span class="hidden md:inline">Toggle Filters</span>
+                        </button>
+                        <div class="flex gap-2 sm:gap-4 items-center mx-auto lg:mx-0">
+                            <label for="uploadInput"
+                                class="cursor-pointer flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-white dark:bg-background-dark border-2 border-primary transition-transform duration-200 ease-in-out active:scale-95">
+                                <span class="material-symbols-outlined text-xl sm:text-2xl text-primary">upload</span>
+                            </label>
+                            <input id="uploadInput" type="file" accept="image/*" class="hidden" />
+                            <button id="captureBtn"
+                                class="group relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-primary ring-4 ring-primary/30 transition-transform duration-200 ease-in-out active:scale-95">
+                                <span
+                                    class="material-symbols-outlined fill text-2xl sm:text-3xl text-background-dark">camera</span>
+                            </button>
+                        </div>
+                        <button id="finishBtn" disabled
+                            class="rounded-lg bg-primary/20 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-primary transition-colors hover:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="hidden sm:inline">Finish &amp; Preview</span>
+                            <span class="sm:hidden">Done</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+            <!-- Live Filter Panel -->
+            <aside
+                class="flex h-auto lg:h-full w-full lg:w-[340px] shrink-0 flex-col border-t lg:border-t-0 lg:border-l border-black/10 bg-white/70 p-4 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-background-dark/70 max-h-[50vh] lg:max-h-none">
+                <div class="flex items-center gap-3 pb-4">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+                        <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-base font-semibold leading-tight">LIVE FILTER PANEL</h1>
+                        <p class="text-sm font-normal leading-tight text-text-light/60 dark:text-text-dark/60">Real-time
+                            adjustments</p>
+                    </div>
+                </div>
+                <div class="flex-1 space-y-6 overflow-y-auto overflow-x-hidden pr-2 pt-2 scrollbar-thin"
+                    style="max-height: calc(100vh - 200px); scrollbar-width: thin; scrollbar-color: #e7b923 rgba(0,0,0,0.1);">
+                    <!-- Classic Filters -->
+                    <div>
+                        <h2 class="mb-3 text-sm font-medium text-text-light/80 dark:text-text-dark/80">Classic Filters
+                        </h2>
+                        <div class="flex gap-3 overflow-x-auto pb-2">
+                            <div class="flex w-20 shrink-0 flex-col items-center gap-2 cursor-pointer"
+                                data-filter="none">
+                                <div
+                                    class="h-20 w-20 rounded-lg bg-gray-400 border-2 border-primary flex items-center justify-center">
+                                    <span class="text-xs font-bold">Original</span>
+                                </div>
+                                <p class="text-xs font-medium">None</p>
+                            </div>
+                            <div class="flex w-20 shrink-0 flex-col items-center gap-2 cursor-pointer"
+                                data-filter="sepia">
+                                <div class="h-20 w-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                    style="filter: sepia(0.8);">
+                                    <span class="text-xs font-bold">S</span>
+                                </div>
+                                <p class="text-xs font-medium">Sepia</p>
+                            </div>
+                            <div class="flex w-20 shrink-0 flex-col items-center gap-2 cursor-pointer"
+                                data-filter="noir">
+                                <div class="h-20 w-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                    style="filter: grayscale(1);">
+                                    <span class="text-xs font-bold">N</span>
+                                </div>
+                                <p class="text-xs">Noir</p>
+                            </div>
+                            <div class="flex w-20 shrink-0 flex-col items-center gap-2 cursor-pointer"
+                                data-filter="vivid">
+                                <div class="h-20 w-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                    style="filter: contrast(1.5) saturate(1.2);">
+                                    <span class="text-xs font-bold">V</span>
+                                </div>
+                                <p class="text-xs">Vivid</p>
+                            </div>
+                            <div class="flex w-20 shrink-0 flex-col items-center gap-2 cursor-pointer"
+                                data-filter="cool">
+                                <div class="h-20 w-20 rounded-lg bg-gray-400 border-2 border-transparent flex items-center justify-center"
+                                    style="filter: brightness(1.2) hue-rotate(180deg);">
+                                    <span class="text-xs font-bold">C</span>
+                                </div>
+                                <p class="text-xs">Cool</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Manual Adjustments -->
+                    <div>
+                        <h2 class="mb-4 text-sm font-medium text-text-light/80 dark:text-text-dark/80">Manual
+                            Adjustments</h2>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 gap-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-medium">Brightness</label>
+                                    <span id="brightnessValue"
+                                        class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                                </div>
+                                <input id="brightnessSlider"
+                                    class="h-1 w-full cursor-pointer appearance-none rounded-full bg-black/10 accent-primary dark:bg-white/20"
+                                    max="100" min="-100" type="range" value="0" />
+                            </div>
+                            <div class="grid grid-cols-1 gap-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-medium">Contrast</label>
+                                    <span id="contrastValue"
+                                        class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                                </div>
+                                <input id="contrastSlider"
+                                    class="h-1 w-full cursor-pointer appearance-none rounded-full bg-black/10 accent-primary dark:bg-white/20"
+                                    max="100" min="-100" type="range" value="0" />
+                            </div>
+                            <div class="grid grid-cols-1 gap-1">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-medium">Saturation</label>
+                                    <span id="saturationValue"
+                                        class="text-xs text-text-light/60 dark:text-text-dark/60">0</span>
+                                </div>
+                                <input id="saturationSlider"
+                                    class="h-1 w-full cursor-pointer appearance-none rounded-full bg-black/10 accent-primary dark:bg-white/20"
+                                    max="100" min="-100" type="range" value="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Color Grading -->
+                    <div>
+                        <h2 class="mb-3 text-sm font-medium text-text-light/80 dark:text-text-dark/80">Color Grading
+                        </h2>
+                        <div class="flex justify-around">
+                            <div class="flex flex-col items-center gap-2">
+                                <label class="text-xs font-medium">Shadows</label>
+                                <div class="h-10 w-10 cursor-pointer rounded-full border-2 border-border-light dark:border-border-dark"
+                                    style="background-color: #3b82f6;"></div>
+                            </div>
+                            <div class="flex flex-col items-center gap-2">
+                                <label class="text-xs font-medium">Highlights</label>
+                                <div class="h-10 w-10 cursor-pointer rounded-full border-2 border-border-light dark:border-border-dark"
+                                    style="background-color: #f59e0b;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Special Effects -->
+                    <div>
+                        <h2 class="mb-3 text-sm font-medium text-text-light/80 dark:text-text-dark/80">Special Effects
+                        </h2>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between rounded-lg bg-black/5 p-3 dark:bg-white/5">
+                                <p class="text-sm font-medium">Black &amp; White</p>
+                                <button id="bwToggle" aria-checked="false"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none dark:bg-gray-700"
+                                    role="switch">
+                                    <span
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between rounded-lg bg-black/5 p-3 dark:bg-white/5">
+                                <p class="text-sm font-medium">Invert</p>
+                                <button id="invertToggle" aria-checked="false"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none dark:bg-gray-700"
+                                    role="switch">
+                                    <span
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Global Controls -->
+                <div class="flex flex-col gap-4 border-t border-black/10 pt-4 dark:border-white/10">
+                    <div class="grid grid-cols-1 gap-1">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-medium">Filter Intensity</label>
+                            <span id="intensityValue"
+                                class="text-xs text-text-light/60 dark:text-text-dark/60">100%</span>
+                        </div>
+                        <input id="intensitySlider"
+                            class="h-1 w-full cursor-pointer appearance-none rounded-full bg-black/10 accent-primary dark:bg-white/20"
+                            max="100" min="0" type="range" value="100" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="resetBtn"
+                            class="rounded-lg bg-black/5 px-4 py-2 text-sm font-medium transition-colors hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Reset
+                            All</button>
+                        <button id="randomBtn"
+                            class="rounded-lg bg-black/5 px-4 py-2 text-sm font-medium transition-colors hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20">Random</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    <script>
+        // Get selected layout from localStorage
+        const layoutData = JSON.parse(localStorage.getItem('selectedLayout'));
+
+        if (!layoutData) {
+            // Redirect to home if no layout selected
+            window.location.href = 'home.html';
+        }
+
+        const totalPhotos = layoutData.rows * layoutData.cols;
+        let capturedPhotos = [];
+
+        // Camera and filter elements
+        const videoElement = document.getElementById('videoElement');
+        const captureCanvas = document.getElementById('captureCanvas');
+        const countdownOverlay = document.getElementById('countdownOverlay');
+        const countdownNumber = document.getElementById('countdownNumber');
+        const progressText = document.getElementById('progressText');
+        const captureBtn = document.getElementById('captureBtn');
+        const uploadInput = document.getElementById('uploadInput');
+        const finishBtn = document.getElementById('finishBtn');
+
+        // Filter controls
+        const brightnessSlider = document.getElementById('brightnessSlider');
+        const contrastSlider = document.getElementById('contrastSlider');
+        const saturationSlider = document.getElementById('saturationSlider');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const resetBtn = document.getElementById('resetBtn');
+        const filterPresets = document.querySelectorAll('[data-filter]');
+
+        // Filter values
+        let filters = {
+            brightness: 0,
+            contrast: 0,
+            saturation: 0,
+            intensity: 100,
+            preset: 'none',
+            bw: false,
+            invert: false
+        };
+
+        // Initialize camera
+        let stream = null;
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: 1280, height: 720 }
+                });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                console.error('Camera access error:', error);
+                alert('Unable to access camera. Please grant camera permissions.');
+            }
+        }
+
+        // Apply filters to video
+        function applyFilters() {
+            let filterString = '';
+            const intensity = filters.intensity / 100;
+
+            // Apply preset filter
+            switch (filters.preset) {
+                case 'sepia':
+                    filterString += `sepia(${0.8 * intensity}) `;
+                    break;
+                case 'noir':
+                    filterString += `grayscale(${1 * intensity}) `;
+                    break;
+                case 'vivid':
+                    filterString += `contrast(${1 + 0.5 * intensity}) saturate(${1 + 0.2 * intensity}) `;
+                    break;
+                case 'cool':
+                    filterString += `brightness(${1 + 0.2 * intensity}) hue-rotate(${180 * intensity}deg) `;
+                    break;
+            }
+
+            // Apply manual adjustments
+            const brightness = 1 + (filters.brightness / 100);
+            const contrast = 1 + (filters.contrast / 100);
+            const saturation = 1 + (filters.saturation / 100);
+
+            filterString += `brightness(${brightness}) contrast(${contrast}) saturate(${saturation})`;
+
+            // Apply special effects
+            if (filters.bw) filterString += ' grayscale(1)';
+            if (filters.invert) filterString += ' invert(1)';
+
+            videoElement.style.filter = filterString;
+        }
+
+        // Filter slider listeners
+        brightnessSlider.addEventListener('input', (e) => {
+            filters.brightness = parseInt(e.target.value);
+            document.getElementById('brightnessValue').textContent = filters.brightness;
+            applyFilters();
+        });
+
+        contrastSlider.addEventListener('input', (e) => {
+            filters.contrast = parseInt(e.target.value);
+            document.getElementById('contrastValue').textContent = filters.contrast;
+            applyFilters();
+        });
+
+        saturationSlider.addEventListener('input', (e) => {
+            filters.saturation = parseInt(e.target.value);
+            document.getElementById('saturationValue').textContent = filters.saturation;
+            applyFilters();
+        });
+
+        intensitySlider.addEventListener('input', (e) => {
+            filters.intensity = parseInt(e.target.value);
+            document.getElementById('intensityValue').textContent = filters.intensity + '%';
+            applyFilters();
+        });
+
+        // Filter preset selection
+        filterPresets.forEach(preset => {
+            preset.addEventListener('click', () => {
+                // Remove border from all presets
+                filterPresets.forEach(p => {
+                    p.querySelector('div').classList.remove('border-primary');
+                    p.querySelector('div').classList.add('border-transparent');
+                });
+
+                // Add border to selected preset
+                preset.querySelector('div').classList.remove('border-transparent');
+                preset.querySelector('div').classList.add('border-primary');
+
+                filters.preset = preset.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        // Reset all filters
+        resetBtn.addEventListener('click', () => {
+            filters = {
+                brightness: 0,
+                contrast: 0,
+                saturation: 0,
+                intensity: 100,
+                preset: 'none',
+                bw: false,
+                invert: false
+            };
+
+            brightnessSlider.value = 0;
+            contrastSlider.value = 0;
+            saturationSlider.value = 0;
+            intensitySlider.value = 100;
+
+            document.getElementById('brightnessValue').textContent = '0';
+            document.getElementById('contrastValue').textContent = '0';
+            document.getElementById('saturationValue').textContent = '0';
+            document.getElementById('intensityValue').textContent = '100%';
+
+            // Reset preset selection
+            filterPresets.forEach(p => {
+                p.querySelector('div').classList.remove('border-primary');
+                p.querySelector('div').classList.add('border-transparent');
+            });
+            document.querySelector('[data-filter="none"] div').classList.add('border-primary');
+
+            // Reset toggle switches visually
+            updateToggleVisual(document.getElementById('bwToggle'), false);
+            updateToggleVisual(document.getElementById('invertToggle'), false);
+
+            applyFilters();
+        });
+
+        // === Camera Switch ===
+        let facingMode = 'user'; // 'user' = front, 'environment' = back
+        const cameraSwitchBtn = document.getElementById('cameraSwitchBtn');
+        const cameraLabel = document.getElementById('cameraLabel');
+
+        if (cameraSwitchBtn) {
+            cameraSwitchBtn.addEventListener('click', async () => {
+                // Toggle between front and back camera
+                facingMode = facingMode === 'user' ? 'environment' : 'user';
+                cameraLabel.textContent = facingMode === 'user' ? 'Front Camera' : 'Back Camera';
+
+                // Stop current stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                // Restart with new facing mode
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: facingMode, width: 1280, height: 720 }
+                    });
+                    videoElement.srcObject = stream;
+                } catch (error) {
+                    console.error('Camera switch error:', error);
+                    // Revert on failure
+                    facingMode = facingMode === 'user' ? 'environment' : 'user';
+                    cameraLabel.textContent = facingMode === 'user' ? 'Front Camera' : 'Back Camera';
+                    alert('Could not switch camera. This device may only have one camera.');
+                }
+            });
+        }
+
+        // === Toggle Filters Panel (show/hide) ===
+        const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
+        const filterPanel = document.querySelector('aside');
+
+        if (toggleFiltersBtn && filterPanel) {
+            toggleFiltersBtn.addEventListener('click', () => {
+                filterPanel.classList.toggle('hidden');
+            });
+        }
+
+        // === Random Filter Button ===
+        const randomBtn = document.getElementById('randomBtn');
+        if (randomBtn) {
+            randomBtn.addEventListener('click', () => {
+                // Generate random values for each filter slider
+                const randomBrightness = Math.floor(Math.random() * 201) - 100;
+                const randomContrast = Math.floor(Math.random() * 201) - 100;
+                const randomSaturation = Math.floor(Math.random() * 201) - 100;
+
+                // Pick a random preset
+                const presetNames = ['none', 'sepia', 'noir', 'vivid', 'cool'];
+                const randomPreset = presetNames[Math.floor(Math.random() * presetNames.length)];
+
+                filters.brightness = randomBrightness;
+                filters.contrast = randomContrast;
+                filters.saturation = randomSaturation;
+                filters.preset = randomPreset;
+
+                // Update UI to match
+                brightnessSlider.value = randomBrightness;
+                contrastSlider.value = randomContrast;
+                saturationSlider.value = randomSaturation;
+
+                document.getElementById('brightnessValue').textContent = randomBrightness;
+                document.getElementById('contrastValue').textContent = randomContrast;
+                document.getElementById('saturationValue').textContent = randomSaturation;
+
+                // Update preset selection UI
+                filterPresets.forEach(p => {
+                    p.querySelector('div').classList.remove('border-primary');
+                    p.querySelector('div').classList.add('border-transparent');
+                });
+                const matchedPreset = document.querySelector(`[data-filter="${randomPreset}"] div`);
+                if (matchedPreset) {
+                    matchedPreset.classList.remove('border-transparent');
+                    matchedPreset.classList.add('border-primary');
+                }
+
+                applyFilters();
+            });
+        }
+
+        // === B&W and Invert Toggles ===
+        // Helper to update toggle switch appearance
+        function updateToggleVisual(btn, isOn) {
+            if (!btn) return;
+            btn.setAttribute('aria-checked', isOn ? 'true' : 'false');
+            const knob = btn.querySelector('span');
+            if (isOn) {
+                btn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                btn.classList.add('bg-primary');
+                knob.classList.remove('translate-x-0');
+                knob.classList.add('translate-x-5');
+            } else {
+                btn.classList.remove('bg-primary');
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                knob.classList.remove('translate-x-5');
+                knob.classList.add('translate-x-0');
+            }
+        }
+
+        const bwToggle = document.getElementById('bwToggle');
+        const invertToggle = document.getElementById('invertToggle');
+
+        if (bwToggle) {
+            bwToggle.addEventListener('click', () => {
+                filters.bw = !filters.bw;
+                updateToggleVisual(bwToggle, filters.bw);
+                applyFilters();
+            });
+        }
+
+        if (invertToggle) {
+            invertToggle.addEventListener('click', () => {
+                filters.invert = !filters.invert;
+                updateToggleVisual(invertToggle, filters.invert);
+                applyFilters();
+            });
+        }
+
+        // Update progress text
+        progressText.textContent = `Capturing: 0/${totalPhotos} photos`;
+
+        // Generate thumbnail slots
+        const thumbnailGrid = document.getElementById('thumbnailGrid');
+        thumbnailGrid.className = `grid flex-1 grid-cols-${Math.min(totalPhotos, 4)} gap-4`;
+
+        for (let i = 0; i < totalPhotos; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'relative flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-border-light dark:border-border-dark';
+            slot.id = `photo-slot-${i}`;
+            slot.innerHTML = '<span class="material-symbols-outlined text-4xl text-text-light/20 dark:text-text-dark/20">add_a_photo</span>';
+            thumbnailGrid.appendChild(slot);
+        }
+
+        // Countdown function
+        function startCountdown(callback) {
+            let count = 3;
+            countdownOverlay.classList.remove('hidden');
+            countdownOverlay.classList.add('flex');
+
+            const interval = setInterval(() => {
+                countdownNumber.textContent = count;
+                count--;
+
+                if (count < 0) {
+                    clearInterval(interval);
+                    countdownOverlay.classList.add('hidden');
+                    countdownOverlay.classList.remove('flex');
+                    callback();
+                }
+            }, 1000);
+        }
+
+        // Capture photo from video
+        function capturePhoto() {
+            captureCanvas.width = videoElement.videoWidth;
+            captureCanvas.height = videoElement.videoHeight;
+
+            const ctx = captureCanvas.getContext('2d');
+
+            // Apply the same filters to canvas
+            ctx.filter = videoElement.style.filter;
+            ctx.drawImage(videoElement, 0, 0);
+
+            return captureCanvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // Capture button functionality
+        captureBtn.addEventListener('click', () => {
+            if (capturedPhotos.length < totalPhotos) {
+                startCountdown(() => {
+                    const photoData = {
+                        id: capturedPhotos.length,
+                        timestamp: Date.now(),
+                        placeholder: capturePhoto(),
+                        filters: { ...filters }
+                    };
+
+                    capturedPhotos.push(photoData);
+
+                    // Update the thumbnail
+                    const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
+                    slot.className = 'relative aspect-video overflow-hidden rounded-lg border-2 border-primary shadow-md';
+                    slot.innerHTML = `<img src="${photoData.placeholder}" class="h-full w-full object-cover" />`;
+
+                    // Update progress
+                    progressText.textContent = `Capturing: ${capturedPhotos.length}/${totalPhotos} photos`;
+
+                    // Enable finish button when all photos captured
+                    if (capturedPhotos.length === totalPhotos) {
+                        finishBtn.disabled = false;
+                    }
+                });
+            }
+        });
+
+        // Upload image handler
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && capturedPhotos.length < totalPhotos) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Draw uploaded image to canvas with current filters
+                        captureCanvas.width = img.width;
+                        captureCanvas.height = img.height;
+                        const ctx = captureCanvas.getContext('2d');
+                        ctx.filter = videoElement.style.filter;
+                        ctx.drawImage(img, 0, 0);
+
+                        const photoData = {
+                            id: capturedPhotos.length,
+                            timestamp: Date.now(),
+                            placeholder: captureCanvas.toDataURL('image/jpeg', 0.9),
+                            filters: { ...filters }
+                        };
+
+                        capturedPhotos.push(photoData);
+
+                        // Update the thumbnail
+                        const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
+                        slot.className = 'relative aspect-video overflow-hidden rounded-lg border-2 border-primary shadow-md';
+                        slot.innerHTML = `<img src="${photoData.placeholder}" class="h-full w-full object-cover" />`;
+
+                        // Update progress
+                        progressText.textContent = `Capturing: ${capturedPhotos.length}/${totalPhotos} photos`;
+
+                        // Enable finish button when all photos captured
+                        if (capturedPhotos.length === totalPhotos) {
+                            finishBtn.disabled = false;
+                        }
+
+                        // Reset input to allow uploading same file again
+                        uploadInput.value = '';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Finish button functionality
+        finishBtn.addEventListener('click', () => {
+            if (capturedPhotos.length === totalPhotos) {
+                localStorage.setItem('capturedPhotos', JSON.stringify(capturedPhotos));
+
+                // Stop camera
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                window.location.href = 'download.html';
+            }
+        });
+
+        // Initialize camera on page load
+        initCamera();
+    </script>
+</body>
+
+</html>
