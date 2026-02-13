@@ -132,7 +132,7 @@
 </head>
 
 <body class="animated-bg font-display text-text-light overflow-hidden">
-    <div class="relative flex h-screen w-full flex-col overflow-hidden">
+    <div class="relative flex w-full flex-col overflow-hidden" style="height: 100vh; height: 100dvh;">
         <div class="flex flex-col lg:flex-row h-full min-h-0">
             <!-- Main Content -->
             <main class="flex flex-1 flex-col p-3 sm:p-4 lg:p-6 min-h-0 overflow-hidden">
@@ -156,9 +156,9 @@
 
                 <!-- Video Feed & Countdown -->
                 <div class="relative flex flex-1 items-center justify-center p-1 sm:p-2 min-h-0">
-                    <div class="relative w-full max-w-5xl rounded-2xl border-2 border-white/40 shadow-2xl h-full max-h-full overflow-hidden"
-                        style="aspect-ratio: 4/3;">
-                        <video id="videoElement" autoplay playsinline
+                    <div class="relative w-full max-w-5xl rounded-2xl border-2 border-white/40 shadow-2xl overflow-hidden"
+                        style="aspect-ratio: 4/3; max-height: 100%;">
+                        <video id="videoElement" autoplay playsinline muted
                             class="h-full w-full rounded-2xl object-cover"></video>
                         <canvas id="captureCanvas" class="hidden"></canvas>
 
@@ -517,6 +517,7 @@
 
         if (!layoutData) {
             window.location.href = 'index.html';
+            throw new Error('No layout selected — redirecting.');
         }
 
         const totalPhotos = layoutData.rows * layoutData.cols;
@@ -566,8 +567,6 @@
             bw: false,
             invert: false
         };
-
-        });
 
         // === Fun Effects Engine ===
 
@@ -816,15 +815,26 @@
         // Initialize camera
         let stream = null;
         async function initCamera() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: 1280, height: 720 }
-                });
-                videoElement.srcObject = stream;
-            } catch (error) {
-                console.error('Camera access error:', error);
-                alert('Unable to access camera. Please grant camera permissions.');
+            const constraints = [
+                { video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } },
+                { video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } },
+                { video: { facingMode: 'user' } },
+                { video: true }
+            ];
+            for (const constraint of constraints) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia(constraint);
+                    videoElement.srcObject = stream;
+                    return;
+                } catch (error) {
+                    console.warn('getUserMedia failed with constraint:', constraint, error);
+                    if (error.name === 'NotAllowedError' || error.name === 'NotFoundError') {
+                        break; // No point retrying with different constraints
+                    }
+                    // OverconstrainedError or other — try next fallback
+                }
             }
+            alert('Unable to access camera. Please grant camera permissions and ensure your device has a camera.');
         }
 
         // Apply filters to video
@@ -978,13 +988,23 @@
                     stream.getTracks().forEach(track => track.stop());
                 }
 
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: facingMode, width: 1280, height: 720 }
-                    });
-                    videoElement.srcObject = stream;
-                } catch (error) {
-                    console.error('Camera switch error:', error);
+                const switchConstraints = [
+                    { video: { facingMode: { exact: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+                    { video: { facingMode: { exact: facingMode }, width: { ideal: 640 }, height: { ideal: 480 } } },
+                    { video: { facingMode: { exact: facingMode } } }
+                ];
+                let switched = false;
+                for (const constraint of switchConstraints) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(constraint);
+                        videoElement.srcObject = stream;
+                        switched = true;
+                        break;
+                    } catch (error) {
+                        console.warn('Camera switch failed with constraint:', constraint, error);
+                    }
+                }
+                if (!switched) {
                     facingMode = facingMode === 'user' ? 'environment' : 'user';
                     cameraLabel.textContent = facingMode === 'user' ? 'Front Camera' : 'Back Camera';
                     alert('Could not switch camera. This device may only have one camera.');
