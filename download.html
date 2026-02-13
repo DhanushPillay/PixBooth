@@ -11,77 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#e7b923",
-                        "background-light": "rgb(176, 236, 181)",
-                        "background-dark": "rgb(176, 236, 181)",
-                        "surface-light": "#f3f0e7",
-                        "surface-dark": "#2a261c",
-                        "text-light": "#1b180e",
-                        "text-dark": "#f3f0e7",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                    boxShadow: {
-                        'soft-lg': '0 8px 30px rgba(0, 0, 0, 0.08)',
-                        'soft-xl': '0 12px 40px rgba(0, 0, 0, 0.1)'
-                    }
-                },
-            },
-        }
-    </script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/shared.css" rel="stylesheet" />
     <style>
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             font-size: 20px;
-        }
-
-        /* Animated gradient background */
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .animated-bg {
-            background: linear-gradient(-45deg, #b0ecb5, #7ecfc0, #a8e6cf, #88d8a8, #c1f0c1);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-        }
-
-        .glass-strong {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         /* Gradient text */
@@ -104,36 +38,6 @@
             50% {
                 background-position: 200% center;
             }
-        }
-
-        /* Entrance animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in-up {
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        .delay-1 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-2 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-3 {
-            animation-delay: 0.3s;
         }
 
         /* Download button glow */
