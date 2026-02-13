@@ -7,7 +7,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>PixBooth</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script src="js/tailwind-config.js"></script>
@@ -586,6 +585,11 @@
 
                 activeEffect = btn.dataset.effect;
 
+                // Lazy-load face detection only when specs is selected
+                if (activeEffect === 'specs' && !faceDetectionReady) {
+                    initFaceDetection();
+                }
+
                 if (activeEffect === 'none') {
                     effectsCanvas.style.display = 'none';
                     videoElement.style.opacity = '1'; // Show raw video again
@@ -631,10 +635,8 @@
 
             effectsCtx.filter = 'none';
 
-            // Throttle to ~30fps
-            setTimeout(() => {
-                effectAnimId = requestAnimationFrame(renderEffectsLoop);
-            }, 33);
+            // Use pure rAF for smooth rendering
+            effectAnimId = requestAnimationFrame(renderEffectsLoop);
         }
 
         // === Effect Implementations ===
@@ -1302,14 +1304,25 @@
         });
 
         // === AR Face Detection for Specs ===
-        // Load face-api.js models when the library is ready
+        // Lazy-load face-api.js only when specs effect is selected
+        let faceApiLoaded = false;
+        function loadFaceApiScript() {
+            return new Promise((resolve, reject) => {
+                if (typeof faceapi !== 'undefined') { resolve(); return; }
+                if (faceApiLoaded) { resolve(); return; }
+                faceApiLoaded = true;
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
         async function initFaceDetection() {
-            if (typeof faceapi === 'undefined') {
-                // Library not loaded yet, retry in 500ms
-                setTimeout(initFaceDetection, 500);
-                return;
-            }
             try {
+                await loadFaceApiScript();
+                if (typeof faceapi === 'undefined') return;
                 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL);
@@ -1319,7 +1332,6 @@
                 console.warn('Face detection models failed to load:', err);
             }
         }
-        initFaceDetection();
 
         // Async face detection loop — runs independently from render loop
         async function faceDetectLoop() {

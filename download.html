@@ -566,6 +566,13 @@
         let emojiPlacementMode = false;
         let selectedEmojiForEdit = null;
 
+        // Debounced render for performance during rapid interactions
+        let _renderTimeout = null;
+        function debouncedRender() {
+            if (_renderTimeout) cancelAnimationFrame(_renderTimeout);
+            _renderTimeout = requestAnimationFrame(() => renderPhotoStrip());
+        }
+
         // Swap two photos and re-render
         function swapPhotos(fromIdx, toIdx) {
             if (toIdx < 0 || toIdx >= capturedPhotos.length) return;
