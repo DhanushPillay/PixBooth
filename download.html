@@ -566,6 +566,42 @@
         let emojiPlacementMode = false;
         let selectedEmojiForEdit = null;
 
+        // Swap two photos and re-render
+        function swapPhotos(fromIdx, toIdx) {
+            if (toIdx < 0 || toIdx >= capturedPhotos.length) return;
+            [capturedPhotos[fromIdx], capturedPhotos[toIdx]] = [capturedPhotos[toIdx], capturedPhotos[fromIdx]];
+            capturedPhotos.forEach((p, i) => p.id = i);
+            PhotoDB.saveAllPhotos(capturedPhotos).catch(err => console.warn('Reorder save failed:', err));
+            renderPhotoStrip();
+        }
+
+        // Create reorder overlay buttons for a photo
+        function createReorderOverlay(index, total, direction) {
+            const controls = document.createElement('div');
+            const isVert = direction === 'vertical';
+            controls.className = `absolute top-1 right-1 flex ${isVert ? 'flex-col' : ''} gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10`;
+            const prev = isVert ? 'arrow_upward' : 'arrow_back';
+            const next = isVert ? 'arrow_downward' : 'arrow_forward';
+
+            if (index > 0) {
+                const btn = document.createElement('button');
+                btn.className = 'reorder-btn p-1 rounded-full bg-black/60 hover:bg-black/80 text-white transition-all';
+                btn.dataset.from = index;
+                btn.dataset.to = index - 1;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">${prev}</span>`;
+                controls.appendChild(btn);
+            }
+            if (index < total - 1) {
+                const btn = document.createElement('button');
+                btn.className = 'reorder-btn p-1 rounded-full bg-black/60 hover:bg-black/80 text-white transition-all';
+                btn.dataset.from = index;
+                btn.dataset.to = index + 1;
+                btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">${next}</span>`;
+                controls.appendChild(btn);
+            }
+            return controls;
+        }
+
         // Generate photo strip based on layout
         function renderPhotoStrip() {
             container.innerHTML = '';
@@ -590,7 +626,7 @@
                 stripWrapper.className = 'relative flex flex-col gap-3';
                 capturedPhotos.forEach((photo, index) => {
                     const wrapper = document.createElement('div');
-                    wrapper.className = getFrameClass();
+                    wrapper.className = 'relative group ' + getFrameClass();
 
                     const img = document.createElement('img');
                     img.src = photo.placeholder;
@@ -599,6 +635,7 @@
                     img.style.objectPosition = 'center 20%';
 
                     wrapper.appendChild(img);
+                    wrapper.appendChild(createReorderOverlay(index, capturedPhotos.length, 'vertical'));
                     stripWrapper.appendChild(wrapper);
                 });
 
@@ -621,11 +658,15 @@
                 gridDiv.className = 'grid grid-cols-2 gap-3 ' + getFrameClass();
 
                 capturedPhotos.forEach((photo, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'relative group';
                     const img = document.createElement('img');
                     img.src = photo.placeholder;
                     img.className = 'w-full aspect-square object-cover rounded-xl';
                     img.style.filter = getFilterString();
-                    gridDiv.appendChild(img);
+                    cell.appendChild(img);
+                    cell.appendChild(createReorderOverlay(index, capturedPhotos.length, 'vertical'));
+                    gridDiv.appendChild(cell);
                 });
 
                 stripWrapper.appendChild(gridDiv);
@@ -648,11 +689,15 @@
                 rowDiv.className = 'flex gap-2 ' + getFrameClass();
 
                 capturedPhotos.forEach((photo, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'relative group flex-1';
                     const img = document.createElement('img');
                     img.src = photo.placeholder;
-                    img.className = 'flex-1 aspect-square object-cover rounded-xl';
+                    img.className = 'w-full aspect-square object-cover rounded-xl';
                     img.style.filter = getFilterString();
-                    rowDiv.appendChild(img);
+                    cell.appendChild(img);
+                    cell.appendChild(createReorderOverlay(index, capturedPhotos.length, 'horizontal'));
+                    rowDiv.appendChild(cell);
                 });
 
                 stripWrapper.appendChild(rowDiv);
@@ -669,6 +714,14 @@
             `;
                 stripWrapper.appendChild(rowFooter);
             }
+
+            // Attach reorder button handlers
+            stripWrapper.querySelectorAll('.reorder-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    swapPhotos(parseInt(btn.dataset.from), parseInt(btn.dataset.to));
+                });
+            });
 
             // Add emojis
             emojis.forEach(emoji => {

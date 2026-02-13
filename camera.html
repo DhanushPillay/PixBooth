@@ -1062,17 +1062,72 @@
         // Update progress text
         progressText.textContent = `Capturing: 0/${totalPhotos} photos`;
 
-        // Generate ghost thumbnail slots
+        // Generate thumbnail slots
         const thumbnailGrid = document.getElementById('thumbnailGrid');
         thumbnailGrid.className = `grid flex-1 grid-cols-${Math.min(totalPhotos, 4)} gap-2 sm:gap-3`;
 
-        for (let i = 0; i < totalPhotos; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'ghost-slot relative flex aspect-video items-center justify-center rounded-xl border-2 border-dashed border-white/40 bg-white/10';
-            slot.id = `photo-slot-${i}`;
-            slot.innerHTML = '<span class="material-symbols-outlined text-3xl text-white/30">add_a_photo</span>';
-            thumbnailGrid.appendChild(slot);
+        function renderThumbnails() {
+            thumbnailGrid.innerHTML = '';
+            for (let i = 0; i < totalPhotos; i++) {
+                const slot = document.createElement('div');
+                slot.id = `photo-slot-${i}`;
+
+                if (i < capturedPhotos.length) {
+                    slot.className = 'relative aspect-video overflow-hidden rounded-xl border-2 border-primary shadow-lg group';
+                    slot.innerHTML = `
+                        <img src="${capturedPhotos[i].placeholder}" class="h-full w-full object-cover" />
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
+                            <button class="retake-btn p-1 rounded-full bg-white/90 hover:bg-white text-gray-800 transition-all hover:scale-110" data-index="${i}" title="Retake this photo">
+                                <span class="material-symbols-outlined" style="font-size:16px;">refresh</span>
+                            </button>
+                            <button class="delete-btn p-1 rounded-full bg-red-400/90 hover:bg-red-500 text-white transition-all hover:scale-110" data-index="${i}" title="Delete this photo">
+                                <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                            </button>
+                        </div>`;
+                } else {
+                    slot.className = 'ghost-slot relative flex aspect-video items-center justify-center rounded-xl border-2 border-dashed border-white/40 bg-white/10';
+                    slot.innerHTML = '<span class="material-symbols-outlined text-3xl text-white/30">add_a_photo</span>';
+                }
+                thumbnailGrid.appendChild(slot);
+            }
+
+            // Retake handlers
+            thumbnailGrid.querySelectorAll('.retake-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    capturedPhotos.splice(idx, 1);
+                    capturedPhotos.forEach((p, i) => p.id = i);
+                    PhotoDB.saveAllPhotos(capturedPhotos).catch(err => console.warn('Retake save failed:', err));
+                    renderThumbnails();
+                });
+            });
+
+            // Delete handlers
+            thumbnailGrid.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    capturedPhotos.splice(idx, 1);
+                    capturedPhotos.forEach((p, i) => p.id = i);
+                    PhotoDB.saveAllPhotos(capturedPhotos).catch(err => console.warn('Delete save failed:', err));
+                    renderThumbnails();
+                });
+            });
+
+            // Update progress + finish button
+            const filled = capturedPhotos.length;
+            progressText.textContent = `Capturing: ${filled}/${totalPhotos} photos`;
+            if (filled === totalPhotos) {
+                finishBtn.disabled = false;
+                finishBtn.classList.add('bg-primary/30');
+            } else {
+                finishBtn.disabled = true;
+                finishBtn.classList.remove('bg-primary/30');
+            }
         }
+
+        renderThumbnails();
 
         // Flash effect helper
         function triggerFlash() {
@@ -1145,18 +1200,7 @@
                     // Save to IndexedDB incrementally (crash resilience)
                     PhotoDB.savePhoto(photoData).catch(err => console.warn('Auto-save failed:', err));
 
-                    // Update the thumbnail with a nice transition
-                    const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
-                    slot.className = 'relative aspect-video overflow-hidden rounded-xl border-2 border-primary shadow-lg transition-all duration-300';
-                    slot.style.animation = 'fadeInUp 0.3s ease-out';
-                    slot.innerHTML = `<img src="${photoData.placeholder}" class="h-full w-full object-cover" />`;
-
-                    progressText.textContent = `Capturing: ${capturedPhotos.length}/${totalPhotos} photos`;
-
-                    if (capturedPhotos.length === totalPhotos) {
-                        finishBtn.disabled = false;
-                        finishBtn.classList.add('bg-primary/30');
-                    }
+                    renderThumbnails();
                 });
             }
         });
@@ -1187,17 +1231,7 @@
                         // Save to IndexedDB incrementally
                         PhotoDB.savePhoto(photoData).catch(err => console.warn('Auto-save failed:', err));
 
-                        const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
-                        slot.className = 'relative aspect-video overflow-hidden rounded-xl border-2 border-primary shadow-lg transition-all duration-300';
-                        slot.style.animation = 'fadeInUp 0.3s ease-out';
-                        slot.innerHTML = `<img src="${photoData.placeholder}" class="h-full w-full object-cover" />`;
-
-                        progressText.textContent = `Capturing: ${capturedPhotos.length}/${totalPhotos} photos`;
-
-                        if (capturedPhotos.length === totalPhotos) {
-                            finishBtn.disabled = false;
-                            finishBtn.classList.add('bg-primary/30');
-                        }
+                        renderThumbnails();
 
                         uploadInput.value = '';
                     };
