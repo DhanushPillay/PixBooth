@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script src="js/tailwind-config.js"></script>
     <link href="css/shared.css" rel="stylesheet" />
+    <script src="js/db.js"></script>
     <style>
         .material-symbols-outlined {
             font-size: 24px;
@@ -1141,6 +1142,9 @@
 
                     capturedPhotos.push(photoData);
 
+                    // Save to IndexedDB incrementally (crash resilience)
+                    PhotoDB.savePhoto(photoData).catch(err => console.warn('Auto-save failed:', err));
+
                     // Update the thumbnail with a nice transition
                     const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
                     slot.className = 'relative aspect-video overflow-hidden rounded-xl border-2 border-primary shadow-lg transition-all duration-300';
@@ -1180,6 +1184,9 @@
 
                         capturedPhotos.push(photoData);
 
+                        // Save to IndexedDB incrementally
+                        PhotoDB.savePhoto(photoData).catch(err => console.warn('Auto-save failed:', err));
+
                         const slot = document.getElementById(`photo-slot-${capturedPhotos.length - 1}`);
                         slot.className = 'relative aspect-video overflow-hidden rounded-xl border-2 border-primary shadow-lg transition-all duration-300';
                         slot.style.animation = 'fadeInUp 0.3s ease-out';
@@ -1201,9 +1208,13 @@
         });
 
         // Finish button functionality
-        finishBtn.addEventListener('click', () => {
+        finishBtn.addEventListener('click', async () => {
             if (capturedPhotos.length === totalPhotos) {
-                localStorage.setItem('capturedPhotos', JSON.stringify(capturedPhotos));
+                try {
+                    await PhotoDB.saveAllPhotos(capturedPhotos);
+                } catch (err) {
+                    console.error('Failed to save photos to IndexedDB:', err);
+                }
 
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
