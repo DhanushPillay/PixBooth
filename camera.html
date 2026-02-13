@@ -122,6 +122,13 @@
         .preset-box {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+        /* Mobile filter panel slide-up */
+        @media (max-width: 1023px) {
+            #filterPanel {
+                transition: transform 0.3s ease;
+            }
+        }
     </style>
 </head>
 
@@ -141,10 +148,10 @@
                     <p id="progressText" class="text-sm sm:text-base font-semibold leading-normal">
                         Capturing: 0/4 photos</p>
                     <button id="cameraSwitchBtn"
-                        class="hidden sm:flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-white/30">
+                        class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-white/30">
                         <span class="material-symbols-outlined text-base">videocam</span>
-                        <span id="cameraLabel">Front Camera</span>
-                        <span class="material-symbols-outlined text-base">expand_more</span>
+                        <span id="cameraLabel" class="hidden sm:inline">Front Camera</span>
+                        <span class="material-symbols-outlined text-base hidden sm:inline">expand_more</span>
                     </button>
                 </div>
 
@@ -188,7 +195,7 @@
                     <!-- Action Bar -->
                     <div class="flex w-full max-w-5xl items-center justify-between gap-2 glass rounded-xl px-3 py-2">
                         <button id="toggleFiltersBtn"
-                            class="hidden sm:flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-all hover:bg-white/30">
+                            class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-all hover:bg-white/30">
                             <span class="material-symbols-outlined text-base">tune</span>
                             <span class="hidden md:inline">Filters</span>
                         </button>
@@ -213,17 +220,26 @@
                 </div>
             </main>
 
+            <!-- Filter Panel Backdrop (mobile only) -->
+            <div id="filterBackdrop" class="hidden fixed inset-0 bg-black/40 z-30 lg:hidden" style="z-index:35;"></div>
+
             <!-- Live Filter Panel (glassmorphism) -->
             <aside id="filterPanel"
-                class="flex h-auto lg:h-full w-full lg:w-[340px] shrink-0 flex-col border-t lg:border-t-0 lg:border-l border-white/30 glass-strong p-4 shadow-2xl max-h-[50vh] lg:max-h-none">
+                class="hidden lg:flex fixed lg:relative bottom-0 left-0 right-0 lg:inset-auto z-40 lg:z-auto
+                       h-auto lg:h-full w-full lg:w-[340px] shrink-0 flex-col
+                       border-t lg:border-t-0 lg:border-l border-white/30 glass-strong p-4 shadow-2xl
+                       max-h-[75vh] lg:max-h-none rounded-t-2xl lg:rounded-none">
                 <div class="flex items-center gap-3 pb-4">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20">
                         <span class="material-symbols-outlined text-primary">auto_awesome</span>
                     </div>
-                    <div class="flex flex-col">
+                    <div class="flex flex-col flex-1">
                         <h1 class="text-base font-bold leading-tight tracking-tight">Live Filters</h1>
                         <p class="text-xs font-medium leading-tight text-text-light/50">Real-time adjustments</p>
                     </div>
+                    <button id="closeFilterPanelBtn" class="lg:hidden flex items-center justify-center h-8 w-8 rounded-full hover:bg-white/30 transition-all">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
                 </div>
                 <div class="flex-1 space-y-5 overflow-y-auto overflow-x-hidden pr-2 pt-2"
                     style="max-height: calc(100vh - 200px); scrollbar-width: thin; scrollbar-color: #e7b923 rgba(0,0,0,0.1);">
@@ -977,11 +993,38 @@
         // === Toggle Filters Panel ===
         const toggleFiltersBtn = document.getElementById('toggleFiltersBtn');
         const filterPanel = document.getElementById('filterPanel');
+        const filterBackdrop = document.getElementById('filterBackdrop');
+
+        function openFilterPanel() {
+            filterPanel.classList.remove('hidden');
+            filterPanel.classList.add('flex');
+            if (filterBackdrop && window.innerWidth < 1024) {
+                filterBackdrop.classList.remove('hidden');
+            }
+        }
+        function closeFilterPanel() {
+            if (window.innerWidth < 1024) {
+                filterPanel.classList.add('hidden');
+                filterPanel.classList.remove('flex');
+            }
+            if (filterBackdrop) filterBackdrop.classList.add('hidden');
+        }
 
         if (toggleFiltersBtn && filterPanel) {
             toggleFiltersBtn.addEventListener('click', () => {
-                filterPanel.classList.toggle('hidden');
+                if (filterPanel.classList.contains('hidden')) {
+                    openFilterPanel();
+                } else {
+                    closeFilterPanel();
+                }
             });
+        }
+        if (filterBackdrop) {
+            filterBackdrop.addEventListener('click', closeFilterPanel);
+        }
+        const closeFilterPanelBtn = document.getElementById('closeFilterPanelBtn');
+        if (closeFilterPanelBtn) {
+            closeFilterPanelBtn.addEventListener('click', closeFilterPanel);
         }
 
         // === Random Filter Button ===
