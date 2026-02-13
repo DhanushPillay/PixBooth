@@ -53,7 +53,7 @@ Take your photos to the next level with canvas-based real-time effects:
 2.  **Open the project**:
     Navigate to the project directory.
 3.  **Launch**:
-    Since this is a static web application, you can simply open `home.html` in your browser.
+    Since this is a static web application, you can simply open `index.html` in your browser.
     *Recommended*: Use a local development server (like VS Code's "Live Server" extension) for the best experience with camera permissions and module loading.
 
 ## 📝 License

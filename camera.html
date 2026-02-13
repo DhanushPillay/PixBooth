@@ -139,7 +139,7 @@
                 <!-- Top Bar (glassmorphism) -->
                 <div
                     class="flex flex-wrap items-center justify-between gap-2 sm:gap-4 pb-3 glass rounded-xl px-3 py-2 mb-2">
-                    <a href="home.html" aria-label="Back to layout selection"
+                    <a href="index.html" aria-label="Back to layout selection"
                         class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all hover:bg-white/30">
                         <span class="material-symbols-outlined text-base">arrow_back</span>
                         <span class="hidden sm:inline">Choose Layout</span>
@@ -516,7 +516,7 @@
         const layoutData = JSON.parse(localStorage.getItem('selectedLayout'));
 
         if (!layoutData) {
-            window.location.href = 'home.html';
+            window.location.href = 'index.html';
         }
 
         const totalPhotos = layoutData.rows * layoutData.cols;
