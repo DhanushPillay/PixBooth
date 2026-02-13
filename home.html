@@ -98,7 +98,8 @@
 
                             <!-- Strip 3 -->
                             <div class="layout-card animate-fade-in-up stagger-1 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
-                                data-layout="strip3" data-rows="3" data-cols="1" data-name="Strip 3">
+                                data-layout="strip3" data-rows="3" data-cols="1" data-name="Strip 3"
+                                role="button" tabindex="0" aria-label="Strip 3 layout — 3 photos, vertical">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-2 justify-center items-center">
                                     <div class="preview-slot w-full flex-1 rounded-lg"></div>
@@ -113,7 +114,8 @@
 
                             <!-- Strip 4 -->
                             <div class="layout-card animate-fade-in-up stagger-2 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
-                                data-layout="strip4" data-rows="4" data-cols="1" data-name="Strip 4">
+                                data-layout="strip4" data-rows="4" data-cols="1" data-name="Strip 4"
+                                role="button" tabindex="0" aria-label="Strip 4 layout — 4 photos, vertical">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 flex flex-col p-2.5 gap-1.5 justify-center items-center">
                                     <div class="preview-slot w-full flex-1 rounded-lg"></div>
@@ -129,7 +131,8 @@
 
                             <!-- 2x2 Grid -->
                             <div class="layout-card animate-fade-in-up stagger-3 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
-                                data-layout="grid2x2" data-rows="2" data-cols="2" data-name="2x2 Grid">
+                                data-layout="grid2x2" data-rows="2" data-cols="2" data-name="2x2 Grid"
+                                role="button" tabindex="0" aria-label="2 by 2 grid layout — 4 photos, square">
                                 <div
                                     class="w-full h-48 rounded-xl bg-white/40 grid grid-cols-2 grid-rows-2 p-2.5 gap-2">
                                     <div class="preview-slot rounded-lg"></div>
@@ -145,7 +148,8 @@
 
                             <!-- Row 3 -->
                             <div class="layout-card animate-fade-in-up stagger-4 flex flex-col group gap-3 pb-3 glass-strong p-4 sm:p-5 rounded-2xl border-2 border-transparent hover:border-primary/60 transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl"
-                                data-layout="row3" data-rows="1" data-cols="3" data-name="Row 3">
+                                data-layout="row3" data-rows="1" data-cols="3" data-name="Row 3"
+                                role="button" tabindex="0" aria-label="Row 3 layout — 3 photos, horizontal">
                                 <div class="w-full h-48 rounded-xl bg-white/40 flex p-2.5 gap-2 items-center">
                                     <div class="preview-slot flex-1 h-full rounded-lg"></div>
                                     <div class="preview-slot flex-1 h-full rounded-lg"></div>
@@ -199,6 +203,12 @@
         layoutCards.forEach(card => {
             card.addEventListener('click', () => {
                 selectLayout(card);
+            });
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectLayout(card);
+                }
             });
         });
 
